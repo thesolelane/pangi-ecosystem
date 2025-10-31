@@ -71,8 +71,8 @@ describe('IDL File Validation', () => {
       expect(idl.instructions).toHaveLength(2);
       
       const instructionNames = idl.instructions.map((i: any) => i.name);
-      expect(instructionNames).toContain('transferWithTax');
-      expect(instructionNames).toContain('initializeTaxConfig');
+      expect(instructionNames).toContain('transfer_with_tax');
+      expect(instructionNames).toContain('initialize_tax_config');
     });
 
     test('pangi_nft.json should have correct structure', () => {
@@ -84,8 +84,8 @@ describe('IDL File Validation', () => {
       expect(idl.instructions).toHaveLength(2);
       
       const instructionNames = idl.instructions.map((i: any) => i.name);
-      expect(instructionNames).toContain('initializeHatchling');
-      expect(instructionNames).toContain('evolveHatchling');
+      expect(instructionNames).toContain('initialize_hatchling');
+      expect(instructionNames).toContain('evolve_hatchling');
     });
 
     test('pangi_vault.json should have correct structure', () => {
@@ -97,9 +97,9 @@ describe('IDL File Validation', () => {
       expect(idl.instructions).toHaveLength(3);
       
       const instructionNames = idl.instructions.map((i: any) => i.name);
-      expect(instructionNames).toContain('createVault');
-      expect(instructionNames).toContain('depositTokens');
-      expect(instructionNames).toContain('withdrawTokens');
+      expect(instructionNames).toContain('create_vault');
+      expect(instructionNames).toContain('deposit_tokens');
+      expect(instructionNames).toContain('withdraw_tokens');
     });
 
     test('special_distribution.json should have correct structure', () => {
@@ -111,9 +111,9 @@ describe('IDL File Validation', () => {
       expect(idl.instructions).toHaveLength(3);
       
       const instructionNames = idl.instructions.map((i: any) => i.name);
-      expect(instructionNames).toContain('initializeDistribution');
-      expect(instructionNames).toContain('claimRewards');
-      expect(instructionNames).toContain('distributeToVault');
+      expect(instructionNames).toContain('initialize_distribution');
+      expect(instructionNames).toContain('claim_rewards');
+      expect(instructionNames).toContain('distribute_to_vault');
     });
   });
 

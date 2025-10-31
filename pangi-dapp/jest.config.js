@@ -22,6 +22,9 @@ const customJestConfig = {
     '!**/*.d.ts',
     '!**/node_modules/**',
   ],
+  transformIgnorePatterns: [
+    'node_modules/(?!(uuid|@solana|@coral-xyz|@noble|jayson|@metaplex-foundation)/)',
+  ],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
