@@ -1,7 +1,7 @@
 [build]
   base = "pangi-dapp"
   command = "npm run build"
-  publish = "pangi-dapp/out"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "20"
