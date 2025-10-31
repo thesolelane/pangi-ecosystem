@@ -1,0 +1,38 @@
+// The Dev Container format allows you to configure your environment. At the heart of it
+// is a Docker image or Dockerfile which controls the tools available in your environment.
+//
+// See https://aka.ms/devcontainer.json for more information.
+{
+	"name": "Pangi Ecosystem",
+	"build": {
+		"context": ".",
+		"dockerfile": "Dockerfile"
+	},
+	
+	// Configure tool-specific properties
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"bradlc.vscode-tailwindcss",
+				"rust-lang.rust-analyzer"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				"editor.defaultFormatter": "esbenp.prettier-vscode"
+			}
+		}
+	},
+	
+	// Forward ports for development
+	"forwardPorts": [3000, 8080],
+	
+	// Run commands after container is created
+	"postCreateCommand": "echo '✅ Dev container ready! Node: $(node --version) | NPM: $(npm --version)'",
+	
+	// Set environment variables
+	"remoteEnv": {
+		"NODE_ENV": "development"
+	}
+}
