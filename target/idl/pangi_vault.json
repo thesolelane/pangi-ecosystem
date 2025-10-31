@@ -1,0 +1,68 @@
+{
+  "version": "0.1.0",
+  "name": "pangi_vault",
+  "metadata": {
+    "address": "5ghkR1LyUMA4K8Dhit2ssqnBbWsZv3sWgvbFSoTKnhw2"
+  },
+  "instructions": [
+    {
+      "name": "create_vault",
+      "accounts": [
+        {"name": "vault", "isMut": true, "isSigner": false},
+        {"name": "nftMint", "isMut": false, "isSigner": false},
+        {"name": "authority", "isMut": true, "isSigner": true},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": []
+    },
+    {
+      "name": "deposit_tokens",
+      "accounts": [
+        {"name": "vault", "isMut": false, "isSigner": false},
+        {"name": "nftMint", "isMut": false, "isSigner": false},
+        {"name": "userTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "vaultTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "tokenMint", "isMut": false, "isSigner": false},
+        {"name": "authority", "isMut": false, "isSigner": true},
+        {"name": "tokenProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "amount", "type": "u64"}
+      ]
+    },
+    {
+      "name": "withdraw_tokens",
+      "accounts": [
+        {"name": "vault", "isMut": false, "isSigner": false},
+        {"name": "nftMint", "isMut": false, "isSigner": false},
+        {"name": "vaultTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "userTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "tokenMint", "isMut": false, "isSigner": false},
+        {"name": "authority", "isMut": false, "isSigner": true},
+        {"name": "tokenProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "amount", "type": "u64"}
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Vault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "nftMint", "type": "publicKey"},
+          {"name": "authority", "type": "publicKey"},
+          {"name": "bump", "type": "u8"},
+          {"name": "createdAt", "type": "i64"}
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {"code": 6000, "name": "VaultAuthorityMismatch", "msg": "Vault authority does not match"},
+    {"code": 6001, "name": "InsufficientVaultBalance", "msg": "Insufficient tokens in vault"},
+    {"code": 6002, "name": "InvalidNFTMint", "msg": "Invalid NFT mint for this vault"}
+  ]
+}
