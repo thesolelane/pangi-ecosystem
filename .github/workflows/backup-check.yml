@@ -1,0 +1,58 @@
+name: Backup Check
+
+on:
+  push:
+    branches: [ main, fix/*, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-critical-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check IDL files exist
+        run: |
+          echo "Checking for IDL files..."
+          test -f target/idl/pangi_token.json || (echo "❌ Missing pangi_token.json" && exit 1)
+          test -f target/idl/pangi_nft.json || (echo "❌ Missing pangi_nft.json" && exit 1)
+          test -f target/idl/pangi_vault.json || (echo "❌ Missing pangi_vault.json" && exit 1)
+          test -f target/idl/special_distribution.json || (echo "❌ Missing special_distribution.json" && exit 1)
+          echo "✅ All IDL files present"
+      
+      - name: Check TypeScript types exist
+        run: |
+          echo "Checking for TypeScript types..."
+          test -f pangi-dapp/lib/types/pangi_token.ts || (echo "❌ Missing pangi_token.ts" && exit 1)
+          test -f pangi-dapp/lib/types/pangi_nft.ts || (echo "❌ Missing pangi_nft.ts" && exit 1)
+          test -f pangi-dapp/lib/types/pangi_vault.ts || (echo "❌ Missing pangi_vault.ts" && exit 1)
+          test -f pangi-dapp/lib/types/special_distribution.ts || (echo "❌ Missing special_distribution.ts" && exit 1)
+          echo "✅ All TypeScript types present"
+      
+      - name: Check SDK files exist
+        run: |
+          echo "Checking for SDK files..."
+          test -f pangi-dapp/lib/sdk/token.ts || (echo "❌ Missing token.ts" && exit 1)
+          test -f pangi-dapp/lib/sdk/nft.ts || (echo "❌ Missing nft.ts" && exit 1)
+          test -f pangi-dapp/lib/sdk/vault.ts || (echo "❌ Missing vault.ts" && exit 1)
+          test -f pangi-dapp/lib/sdk/distribution.ts || (echo "❌ Missing distribution.ts" && exit 1)
+          echo "✅ All SDK files present"
+      
+      - name: Validate IDL JSON
+        run: |
+          echo "Validating IDL JSON syntax..."
+          for file in target/idl/*.json; do
+            if ! jq empty "$file" 2>/dev/null; then
+              echo "❌ Invalid JSON in $file"
+              exit 1
+            fi
+          done
+          echo "✅ All IDL files are valid JSON"
+      
+      - name: Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Backup verification complete!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "All critical files are present and valid."
