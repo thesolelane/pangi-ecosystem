@@ -1,5 +1,10 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
+import { TextEncoder, TextDecoder } from 'util'
+
+// Polyfill for TextEncoder/TextDecoder (required for Solana web3.js)
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
