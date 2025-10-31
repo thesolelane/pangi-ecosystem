@@ -16,7 +16,8 @@
     "test:idl": "jest __tests__/idl-validation.test.ts",
     "test:integration": "jest __tests__/integration-examples.test.ts",
     "test:cross-program": "jest __tests__/cross-program.test.ts",
-    "test:all-working": "jest __tests__/idl-validation.test.ts __tests__/integration-examples.test.ts __tests__/sdk-esm.test.ts"
+    "test:nft-evolution": "jest __tests__/nft-evolution.test.ts",
+    "test:all-working": "jest __tests__/idl-validation.test.ts __tests__/integration-examples.test.ts __tests__/sdk-esm.test.ts __tests__/nft-evolution.test.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
