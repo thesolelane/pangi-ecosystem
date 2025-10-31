@@ -12,7 +12,11 @@
     "test:coverage": "jest --coverage",
     "test:connection": "jest __tests__/frontend-connection.test.ts",
     "test:sdk": "jest __tests__/sdk.test.ts",
-    "test:idl": "jest __tests__/idl-validation.test.ts"
+    "test:sdk-esm": "jest __tests__/sdk-esm.test.ts",
+    "test:idl": "jest __tests__/idl-validation.test.ts",
+    "test:integration": "jest __tests__/integration-examples.test.ts",
+    "test:cross-program": "jest __tests__/cross-program.test.ts",
+    "test:all-working": "jest __tests__/idl-validation.test.ts __tests__/integration-examples.test.ts __tests__/sdk-esm.test.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
