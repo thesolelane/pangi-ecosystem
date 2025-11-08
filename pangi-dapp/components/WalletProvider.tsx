@@ -6,8 +6,6 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { RPC_ENDPOINT } from "@/lib/constants";
 
-require("@solana/wallet-adapter-react-ui/styles.css");
-
 export const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const wallets = useMemo(
     () => [

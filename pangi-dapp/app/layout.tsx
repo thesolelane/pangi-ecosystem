@@ -27,11 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ minHeight: "100vh" }}
       >
         <WalletContextProvider>
           <Header />
-          <main className="container mx-auto px-4 py-8">
+          <main className="container mx-auto px-6" style={{ maxWidth: "1200px" }}>
             {children}
           </main>
         </WalletContextProvider>

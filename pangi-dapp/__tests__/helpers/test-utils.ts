@@ -68,13 +68,11 @@ export function getTransferType(
  * Get tax rate for transfer type
  */
 export function getTaxRate(transferType: string): number {
-  const rates: Record<string, number> = {
-    PeerToPeer: 100, // 1%
-    ExchangeDeposit: 50, // 0.5%
-    ConservationReward: 0, // 0%
-    LargeWhale: 200, // 2%
-  };
-  return rates[transferType] || 100;
+  if (transferType === 'ConservationReward') return 0;
+  if (transferType === 'PeerToPeer') return 100;
+  if (transferType === 'ExchangeDeposit') return 50;
+  if (transferType === 'LargeWhale') return 200;
+  return 100; // Default
 }
 
 /**

@@ -9,6 +9,8 @@
  * 
  * Note: These are example tests showing the interaction patterns.
  * Actual execution requires funded wallets and deployed programs.
+ * 
+ * @jest-environment node
  */
 
 import { BN } from '@coral-xyz/anchor';
@@ -190,7 +192,7 @@ describe('Cross-Program Integration Tests', () => {
   describe('Distribution to Vault Flow', () => {
     test('should demonstrate distribution initialization', () => {
       const distributionSetup = {
-        totalSupply: new BN(63_000_000_000_000_000), // 63M PANGI
+        totalSupply: new BN('63000000000000000'), // 63M PANGI (use string for large numbers)
         distributionStart: Math.floor(Date.now() / 1000),
         distributionEnd: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60), // 1 year
         
@@ -202,7 +204,7 @@ describe('Cross-Program Integration Tests', () => {
             systemProgram: SystemProgram.programId.toBase58(),
           },
           args: {
-            totalSupply: new BN(63_000_000_000_000_000),
+            totalSupply: new BN('63000000000000000'),
             distributionStart: new BN(Math.floor(Date.now() / 1000)),
             distributionEnd: new BN(Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60)),
           }
@@ -235,7 +237,7 @@ describe('Cross-Program Integration Tests', () => {
             tokenProgram: TOKEN_PROGRAM_ID.toBase58(),
           },
           args: {
-            amount: new BN(1_000_000_000_000_000), // 1M PANGI
+            amount: new BN('1000000000000000'), // 1M PANGI (use string for large numbers)
           }
         }
       };

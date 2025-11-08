@@ -1,56 +1,106 @@
 {
   "version": "0.1.0",
   "name": "pangi_token",
-  "metadata": {
-    "address": "BDSjfUUwEVHxJ3WLxHgNbKddCXEFVX3thS72fg6F4EaA"
-  },
+  "metadata": {},
   "instructions": [
     {
       "name": "transfer_with_tax",
       "accounts": [
-        {"name": "from", "isMut": true, "isSigner": false},
-        {"name": "to", "isMut": true, "isSigner": false},
-        {"name": "conservationFund", "isMut": true, "isSigner": false},
-        {"name": "authority", "isMut": false, "isSigner": true},
-        {"name": "tokenProgram", "isMut": false, "isSigner": false},
-        {"name": "taxConfig", "isMut": false, "isSigner": false}
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "conservationFund",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "taxConfig",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
       "args": [
-        {"name": "amount", "type": "u64"}
+        {
+          "name": "amount",
+          "type": "u64"
+        }
       ]
     },
     {
       "name": "initialize_tax_config",
       "accounts": [
-        {"name": "taxConfig", "isMut": true, "isSigner": false},
-        {"name": "conservationFund", "isMut": false, "isSigner": false},
-        {"name": "authority", "isMut": true, "isSigner": true},
-        {"name": "systemProgram", "isMut": false, "isSigner": false}
+        {
+          "name": "taxConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "conservationFund",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
       "args": [
-        {"name": "p2pTaxRate", "type": "u16"},
-        {"name": "exchangeTaxRate", "type": "u16"},
-        {"name": "whaleTaxRate", "type": "u16"},
-        {"name": "whaleThreshold", "type": "u64"}
+        {
+          "name": "p2pTaxRate",
+          "type": "u16"
+        },
+        {
+          "name": "exchangeTaxRate",
+          "type": "u16"
+        },
+        {
+          "name": "whaleTaxRate",
+          "type": "u16"
+        },
+        {
+          "name": "whaleThreshold",
+          "type": "u64"
+        }
       ]
     }
   ],
   "accounts": [
     {
       "name": "TaxConfig",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {"name": "authority", "type": "publicKey"},
-          {"name": "p2pTaxRate", "type": "u16"},
-          {"name": "exchangeTaxRate", "type": "u16"},
-          {"name": "whaleTaxRate", "type": "u16"},
-          {"name": "whaleTransferThreshold", "type": "u64"},
-          {"name": "maxTaxPerTransfer", "type": "u64"},
-          {"name": "conservationFund", "type": "publicKey"},
-          {"name": "lastUpdated", "type": "i64"}
-        ]
-      }
+      "discriminator": [
+        38,
+        187,
+        35,
+        231,
+        115,
+        102,
+        30,
+        82
+      ]
     }
   ],
   "types": [
@@ -59,12 +109,61 @@
       "type": {
         "kind": "enum",
         "variants": [
-          {"name": "PeerToPeer"},
-          {"name": "ExchangeDeposit"},
-          {"name": "ConservationReward"},
-          {"name": "LargeWhale"}
+          {
+            "name": "PeerToPeer"
+          },
+          {
+            "name": "ExchangeDeposit"
+          },
+          {
+            "name": "ConservationReward"
+          },
+          {
+            "name": "LargeWhale"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TaxConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "p2pTaxRate",
+            "type": "u16"
+          },
+          {
+            "name": "exchangeTaxRate",
+            "type": "u16"
+          },
+          {
+            "name": "whaleTaxRate",
+            "type": "u16"
+          },
+          {
+            "name": "whaleTransferThreshold",
+            "type": "u64"
+          },
+          {
+            "name": "maxTaxPerTransfer",
+            "type": "u64"
+          },
+          {
+            "name": "conservationFund",
+            "type": "pubkey"
+          },
+          {
+            "name": "lastUpdated",
+            "type": "i64"
+          }
         ]
       }
     }
-  ]
+  ],
+  "address": "BDSjfUUwEVHxJ3WLxHgNbKddCXEFVX3thS72fg6F4EaA"
 }

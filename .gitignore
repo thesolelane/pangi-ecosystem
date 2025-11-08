@@ -137,3 +137,150 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# ============================================================================
+# Solana & Anchor Specific
+# ============================================================================
+
+# Anchor build artifacts
+target/
+.anchor/
+
+# Solana keypairs (NEVER commit private keys!)
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!jest.config.json
+!.vscode/*.json
+!target/idl/*.json
+!target/types/*.json
+
+# Solana CLI config
+.config/
+
+# Test ledger
+test-ledger/
+
+# Program keypairs (keep these in .gitignore for security)
+# Uncomment if you want to track program keypairs (NOT RECOMMENDED)
+# !target/deploy/*.json
+
+# ============================================================================
+# IDE & Editor
+# ============================================================================
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# Operating System
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# Temporary & Backup Files
+# ============================================================================
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+*.tmp
+
+# IDL backups (created by fix scripts)
+*.json.backup
+target/idl/*.backup
+
+# ============================================================================
+# Build & Distribution
+# ============================================================================
+
+# Build outputs
+build/
+dist/
+out/
+
+# Compiled files
+*.so
+*.dylib
+*.dll
+
+# ============================================================================
+# Testing & Coverage
+# ============================================================================
+
+# Test outputs
+test-results/
+coverage/
+.nyc_output/
+*.lcov
+
+# Jest
+jest-results/
+
+# ============================================================================
+# Documentation
+# ============================================================================
+
+# Generated docs (if using doc generators)
+docs/generated/
+api-docs/
+
+# ============================================================================
+# Miscellaneous
+# ============================================================================
+
+# Local environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+debug.log
+error.log
+
+# Temporary scripts
+temp-*.sh
+temp-*.js
+temp-*.mjs

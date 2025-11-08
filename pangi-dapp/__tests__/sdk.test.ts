@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 import { PublicKey } from '@solana/web3.js';
 import {
   getTaxConfigPDA,

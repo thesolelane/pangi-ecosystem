@@ -1,385 +1,205 @@
-# 🦎 PANGI Pangolin Ecosystem
+<div align="center">
 
-> A complete Solana-based conservation ecosystem with dynamic taxation, evolving NFTs, and asset management vaults.
+# 🐼 PANGI Ecosystem
 
-## 🌟 Overview
+**A comprehensive Solana token ecosystem with dynamic tax rates, NFT evolution, and advanced DeFi features**
 
-PANGI is a multi-program Solana ecosystem designed to fund pangolin conservation through innovative blockchain mechanics. Every transaction contributes to saving pangolins while providing utility and rewards to holders.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Solana](https://img.shields.io/badge/Solana-1.16+-purple.svg)](https://solana.com)
+[![Anchor](https://img.shields.io/badge/Anchor-0.32.1-coral.svg)](https://www.anchor-lang.com/)
+[![Tests](https://img.shields.io/badge/tests-180%20passing-success.svg)](TEST_SUMMARY.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## 📦 Programs
+[Quick Start](#-quick-start) •
+[Documentation](#-documentation) •
+[Features](#-features) •
+[Contributing](#-contributing) •
+[Community](#-community)
 
-### 1. Pangi Token (✅ Complete)
-**Fungible SPL token with conservation tax**
+</div>
 
-- Dynamic tax rates (P2P: 1%, Exchange: 0.5%, Whale: 2%)
-- Basis points precision (0.01%)
-- Exchange & reward distributor registries
-- Space-optimized (146 bytes)
-- **Status:** Production-ready
+---
 
-[📖 Documentation](programs/pangi-token/README.md)
+## 🎯 Overview
 
-### 2. Pangi NFT (🚧 In Progress)
-**Metaplex-compatible NFTs with evolution mechanics**
+PANGI is a Solana-based token ecosystem built with Anchor, featuring four interconnected on-chain programs that work together to create a unique DeFi experience.
 
-- Evolution system (levels 1-10)
-- Rarity tiers (Common → Legendary → Special)
-- Dynamic metadata updates
-- Staking integration
-- 25 special influencer NFTs
-- **Status:** Architecture complete
+### Core Programs
 
-[📖 Documentation](programs/pangi-nft/README.md)
+| Program | Description | Status |
+|---------|-------------|--------|
+| 🪙 **Token Program** | PANGI token with dynamic tax rates (1%, 0.5%, 2%, 0%) | ✅ Ready |
+| 🥚 **NFT Program** | Hatchling NFTs with 10 evolution stages | ✅ Ready |
+| 🏦 **Vault Program** | NFT-linked token storage and management | ✅ Ready |
+| 🎁 **Distribution Program** | Special token distribution (50% burn, 25% vest, 25% liquid) | ✅ Ready |
 
-### 3. Pangi Vault (🚧 In Progress)
-**NFT-attached wallets for asset management**
+### Key Features
 
-- One vault per NFT
-- Multi-token storage
-- Automatic reward accumulation
-- Tax-free withdrawals
-- Staking rewards
-- **Status:** Architecture complete
+- **Dynamic Tax System**: Context-aware tax rates for different transfer types
+- **NFT Evolution**: Hatchlings evolve through 10 stages based on token holdings
+- **Vault Integration**: Secure token storage linked to NFT ownership
+- **Conservation Fund**: Automated tax collection for ecosystem sustainability
+- **Cross-Program Composability**: Programs work together seamlessly
 
-[📖 Documentation](programs/pangi-vault/README.md)
+## ✅ Status
 
-### 4. Special Distribution (✅ Complete)
-**NFT-based token distribution with anti-dump mechanics**
-
-- 63M PANGI distribution
-- Three-layer protection (50% burn, 25% vest, 25% liquid)
-- Tier-based allocation (1M, 5M, 10M)
-- 1-year vesting
-- **Status:** Production-ready
-
-[📖 Documentation](programs/special-distribution/README.md)
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                  PANGI ECOSYSTEM                        │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │         Ecosystem Coordinator (Hub)                │ │
-│  │  • Cross-program orchestration                     │ │
-│  │  • State synchronization                           │ │
-│  │  • Emergency controls                              │ │
-│  └────────┬──────────┬──────────┬─────────────────────┘ │
-│           │          │          │                       │
-│           ▼          ▼          ▼                       │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐               │
-│  │  Token   │ │   NFT    │ │  Vault   │               │
-│  │  ──────  │ │  ─────   │ │  ──────  │               │
-│  │  • Tax   │ │  • Evolve│ │  • Store │               │
-│  │  • Trade │ │  • Stake │ │  • Reward│               │
-│  └──────────┘ └──────────┘ └──────────┘               │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-[📖 Full Architecture](ECOSYSTEM.md)
+- **Tests:** 180 passing (144 CommonJS + 36 ESM)
+- **Programs:** 4 ready for deployment
+- **Scripts:** 7 automated tools
+- **Documentation:** 6 comprehensive guides
 
 ## 🚀 Quick Start
 
-### Prerequisites
 ```bash
-# Install Solana
-sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+# Run tests
+cd pangi-dapp && npm test
 
-# Install Anchor
-cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
-avm install latest
-avm use latest
-
-# Install Node.js (v18+)
-nvm install 18
-nvm use 18
-```
-
-### Build
-```bash
-# Build all programs
-./build.sh
-
-# Or build individually
-cargo build-sbf --manifest-path programs/pangi-token/Cargo.toml
-cargo build-sbf --manifest-path programs/pangi-nft/Cargo.toml
-cargo build-sbf --manifest-path programs/pangi-vault/Cargo.toml
-cargo build-sbf --manifest-path programs/special-distribution/Cargo.toml
-```
-
-### Test
-```bash
-# Run all tests
-anchor test
-
-# Run unit tests
-npm run test:unit
-```
-
-### Deploy
-```bash
 # Deploy to devnet
-solana config set --url devnet
+npm run check:deployment
+anchor build
 anchor deploy --provider.cluster devnet
 
-# Deploy to mainnet
-solana config set --url mainnet-beta
-anchor deploy --provider.cluster mainnet
+# Test real connection
+npm run test:real
 ```
 
-## 📊 Key Features
-
-### Dynamic Tax System
-- **P2P Transfers:** 1% tax
-- **Exchange Deposits:** 0.5% tax
-- **Whale Transfers:** 2% tax (>10M tokens)
-- **Rewards:** 0% tax
-
-### NFT Evolution
-- **10 Levels:** Hatchling → Transcendent
-- **Evolution Points:** Earned through staking, holding, trading
-- **Rewards:** Up to 94,350 PANGI for max evolution
-- **Rarity Bonuses:** Up to +100% for special NFTs
-
-### Vault System
-- **Automatic Accumulation:** Staking + evolution rewards
-- **Tax-Free Withdrawals:** All vault withdrawals exempt
-- **Multi-Token Support:** PANGI + other SPL tokens
-- **NFT-Linked:** Vault transfers with NFT
-
-## 💰 Tokenomics
-
-### Total Supply
-- **1,000,000,000 PANGI** (1 Billion)
-
-### Distribution
-- **Special NFTs:** 63M (6.3%)
-  - 50% burned (31.5M)
-  - 25% vested (15.75M)
-  - 25% liquid (15.75M)
-- **Liquidity:** TBD
-- **Treasury:** TBD
-- **Community:** TBD
-
-### Tax Revenue (Estimated)
-- **Daily:** ~9.5M PANGI (1B volume)
-- **Annual:** ~3.47B PANGI
-- **Destination:** Conservation fund
-
-## 🎯 Use Cases
-
-### For Users
-1. **Buy & Hold:** Earn through appreciation
-2. **Mint NFT:** Get evolving digital asset
-3. **Stake NFT:** Earn passive rewards
-4. **Evolve NFT:** Unlock bonuses
-5. **Trade:** Participate in ecosystem
-
-### For Influencers
-1. **Receive Special NFT:** 1M-10M PANGI allocation
-2. **Tax Exemption:** 0% tax on transfers
-3. **2x Rewards:** Double staking & evolution
-4. **Exclusive Benefits:** Special perks
-5. **Conservation Impact:** Direct contribution
-
-### For Developers
-1. **CPI Integration:** Call programs from your code
-2. **Composability:** Build on top of ecosystem
-3. **SDK Access:** TypeScript/Rust SDKs
-4. **Event Listening:** React to ecosystem events
-5. **Open Source:** Contribute to codebase
-
-## 📈 Roadmap
-
-### Phase 1: Foundation (✅ Complete)
-- [x] Pangi Token with dynamic tax
-- [x] Special Distribution program
-- [x] Build & test infrastructure
-- [x] Documentation
-
-### Phase 2: NFT & Vaults (🚧 In Progress)
-- [ ] Pangi NFT with evolution
-- [ ] Pangi Vault with rewards
-- [ ] Cross-program integration
-- [ ] Integration tests
-
-### Phase 3: Launch (🔜 Coming Soon)
-- [ ] Security audit
-- [ ] Devnet testing
-- [ ] Mainnet deployment
-- [ ] Special NFT distribution
-
-### Phase 4: Expansion (🔮 Future)
-- [ ] Governance system
-- [ ] DAO treasury
-- [ ] NFT marketplace
-- [ ] Cross-chain bridges
-
-## 🔐 Security
-
-### Audits
-- **Status:** Pending
-- **Scope:** All programs
-- **Timeline:** Before mainnet
-
-### Best Practices
-- ✅ Checked arithmetic
-- ✅ Account validation
-- ✅ PDA security
-- ✅ Authority checks
-- ✅ Rate limiting
-
-### Bug Bounty
-- **Program:** Coming soon
-- **Rewards:** TBD
-- **Scope:** All programs
+See [QUICK_START.md](QUICK_START.md) for detailed instructions.
 
 ## 📚 Documentation
 
-### Program Documentation
-- [Pangi Token](programs/pangi-token/README.md)
-- [Pangi NFT](programs/pangi-nft/README.md)
-- [Pangi Vault](programs/pangi-vault/README.md)
-- [Special Distribution](programs/special-distribution/README.md)
+- [QUICK_START.md](QUICK_START.md) - Quick reference
+- [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) - Complete deployment walkthrough
+- [TEST_SUMMARY.md](TEST_SUMMARY.md) - Test documentation (180 tests)
+- [DEVNET_TESTING.md](DEVNET_TESTING.md) - Token transfer testing
+- [README_SCRIPTS.md](README_SCRIPTS.md) - Scripts reference
 
-### Technical Documentation
-- [Architecture](ECOSYSTEM.md)
-- [Build Guide](BUILD.md)
-- [Dynamic Tax System](programs/pangi-token/DYNAMIC_TAX.md)
-- [Registry System](programs/pangi-token/REGISTRY_SYSTEM.md)
-- [Optimizations](programs/pangi-token/OPTIMIZATIONS.md)
+## 🛠️ Scripts
 
-### API Documentation
-- [TypeScript SDK](#) (Coming soon)
-- [Rust SDK](#) (Coming soon)
-- [REST API](#) (Coming soon)
+```bash
+npm run test:real          # Test real program connection
+npm run check:deployment   # Pre-deployment checklist
+npm run check:programs     # Verify deployment status
+npm run verify:devnet      # Verify devnet setup
+npm run setup:accounts     # Setup token accounts
+npm run test:transfer      # Test token transfers
+```
+
+## 📊 Test Coverage: 180 Tests
+
+| Category | Tests | Status |
+|----------|-------|--------|
+| Token Program | 41 | ✅ |
+| NFT Program | 30 | ✅ |
+| Vault Program | 10 | ✅ |
+| Distribution Program | 11 | ✅ |
+| Cross-Program | 12 | ✅ |
+| SDK & Integration | 76 | ✅ |
+
+## 🔧 IDL Tools
+
+We've created comprehensive tools for fixing Anchor IDL format issues:
+
+```bash
+# Fix IDL for Anchor 0.32.1
+node scripts/fix-idl-v0.32.mjs
+
+# Test connection
+node scripts/test-connection.js
+```
+
+See [docs/IDL_TROUBLESHOOTING_GUIDE.md](docs/IDL_TROUBLESHOOTING_GUIDE.md) for details.
 
 ## 🤝 Contributing
 
-We welcome contributions!
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-### How to Contribute
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+### Ways to Contribute
+
+- 🐛 Report bugs via [GitHub Issues](https://github.com/thesolelane/pangi-ecosystem/issues)
+- ✨ Suggest features via [GitHub Discussions](https://github.com/thesolelane/pangi-ecosystem/discussions)
+- 📝 Improve documentation
+- 🧪 Add tests
+- 💻 Submit pull requests
 
 ### Development Setup
+
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/thesolelane/pangi-ecosystem.git
 cd pangi-ecosystem
 
 # Install dependencies
 npm install
-
-# Build programs
-./build.sh
+cd pangi-dapp && npm install
 
 # Run tests
-anchor test
+npm test
+
+# Start development
+npm run dev
 ```
 
-### Code Style
-- Follow Rust conventions
-- Use `cargo fmt` for formatting
-- Run `cargo clippy` for linting
-- Add tests for new features
-- Update documentation
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-## 🌍 Conservation Impact
-
-### Mission
-Save pangolins through blockchain innovation
-
-### How It Works
-1. **Every Transfer:** 0.5-2% tax collected
-2. **Conservation Fund:** Taxes accumulate
-3. **Direct Impact:** Fund conservation projects
-4. **Transparency:** All on-chain and verifiable
-
-### Partners
-- Wildlife conservation organizations
-- Pangolin rescue centers
-- Research institutions
-- Community initiatives
-
-### Impact Metrics
-- **Tokens Collected:** Real-time tracking
-- **Projects Funded:** Transparent reporting
-- **Pangolins Saved:** Measurable outcomes
-- **Community Engagement:** Active participation
-
-## 📞 Contact
-
-### Community
-- **Discord:** [Join our server](#)
-- **Twitter:** [@PangiToken](#)
-- **Telegram:** [PANGI Community](#)
-- **Reddit:** [r/PangiToken](#)
-
-### Development
-- **GitHub:** [pangi-ecosystem](https://github.com/thesolelane/pangi-ecosystem)
-- **Issues:** [Report bugs](https://github.com/thesolelane/pangi-ecosystem/issues)
-- **Discussions:** [Join discussions](https://github.com/thesolelane/pangi-ecosystem/discussions)
-
-### Business
-- **Email:** [team@pangi.io](#)
-- **Partnerships:** [partnerships@pangi.io](#)
-- **Press:** [press@pangi.io](#)
-
-## 📄 License
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🔒 Security
 
-- **Solana Foundation** - For the amazing blockchain platform
-- **Anchor Framework** - For making Solana development easier
-- **Metaplex** - For NFT standards
-- **Community** - For support and feedback
-- **Pangolins** - For being awesome 🦎
+Security is a top priority. Please see [SECURITY.md](SECURITY.md) for:
+- Reporting vulnerabilities
+- Security best practices
+- Audit status
 
-## ⚠️ Disclaimer
+**Never commit private keys or sensitive data!**
 
-This is experimental software. Use at your own risk. Not financial advice. Always DYOR (Do Your Own Research).
+## 🌟 Community
 
----
-
-**Built with ❤️ for pangolin conservation**
-
-Every transaction makes a difference! 🦎
-
----
+- **GitHub Issues**: Bug reports and feature requests
+- **GitHub Discussions**: Questions and community chat
+- **Documentation**: Comprehensive guides in [docs/](docs/)
 
 ## 📊 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/thesolelane/pangi-ecosystem?style=social)
-![GitHub forks](https://img.shields.io/github/forks/thesolelane/pangi-ecosystem?style=social)
-![GitHub issues](https://img.shields.io/github/issues/thesolelane/pangi-ecosystem)
-![GitHub license](https://img.shields.io/github/license/thesolelane/pangi-ecosystem)
+- **Programs**: 4 Solana programs
+- **Tests**: 180 passing (100% success rate)
+- **Documentation**: 15+ comprehensive guides
+- **Scripts**: 10+ automation tools
+- **Lines of Code**: [TBD]
 
-**Status:** 🚧 **Active Development**
+## 🎯 Roadmap
 
-**Version:** 0.1.0
+- [x] Core programs development
+- [x] Comprehensive testing suite
+- [x] IDL troubleshooting tools
+- [x] Documentation
+- [ ] Security audit
+- [ ] Devnet deployment
+- [ ] Testnet deployment
+- [ ] Mainnet launch
 
-**Last Updated:** 2024
+## 🙏 Acknowledgments
+
+- Built with [Anchor](https://www.anchor-lang.com/)
+- Powered by [Solana](https://solana.com/)
+- Developed with assistance from [Ona](https://ona.com/)
+
+## 📞 Support
+
+Need help?
+
+1. Check the [documentation](docs/)
+2. Search [existing issues](https://github.com/thesolelane/pangi-ecosystem/issues)
+3. Ask in [discussions](https://github.com/thesolelane/pangi-ecosystem/discussions)
+4. Read the [troubleshooting guide](docs/IDL_TROUBLESHOOTING_GUIDE.md)
 
 ---
 
-## 🎯 Quick Links
+<div align="center">
 
-- [🏗️ Architecture](ECOSYSTEM.md)
-- [📖 Build Guide](BUILD.md)
-- [🔧 API Docs](#)
-- [💬 Discord](#)
-- [🐦 Twitter](#)
-- [📧 Email](#)
+**Built with ❤️ for the Solana ecosystem**
 
----
+[Documentation](docs/) • [Contributing](CONTRIBUTING.md) • [License](LICENSE) • [Security](SECURITY.md)
 
-**Let's save pangolins together!** 🦎💚
+</div>

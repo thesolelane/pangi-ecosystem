@@ -17,10 +17,17 @@
     "test:integration": "jest __tests__/integration-examples.test.ts",
     "test:cross-program": "jest __tests__/cross-program.test.ts",
     "test:nft-evolution": "jest __tests__/nft-evolution.test.ts",
-    "test:all-working": "jest __tests__/idl-validation.test.ts __tests__/integration-examples.test.ts __tests__/sdk-esm.test.ts __tests__/nft-evolution.test.ts"
+    "test:token-transfer": "jest __tests__/token-transfer.test.ts",
+    "test:all": "jest",
+    "test:esm": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.esm.js",
+    "test:token": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.esm.js token-program.esm",
+    "test:nft": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.esm.js nft-program.esm",
+    "test:vault": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.esm.js vault-program.esm",
+    "test:distribution": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.esm.js distribution-program.esm"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
+    "@solana/spl-token": "^0.4.14",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
     "@solana/wallet-adapter-react-ui": "^0.9.39",
@@ -38,6 +45,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "jest": "^29.7.0",

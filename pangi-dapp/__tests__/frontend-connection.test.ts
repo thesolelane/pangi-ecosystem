@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { 
