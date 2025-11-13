@@ -1,0 +1,101 @@
+name: IDL Format Issue
+description: Report an IDL format or compatibility issue
+title: "[IDL]: "
+labels: ["idl", "bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report IDL format issues or Anchor version compatibility problems.
+        
+        **Quick Fix:** Try running `node scripts/fix-idl-v0.32.mjs` first!
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Message
+      description: The exact error message you're seeing
+      render: shell
+      placeholder: Paste the full error message here
+    validations:
+      required: true
+
+  - type: input
+    id: anchor-version
+    attributes:
+      label: Anchor Version
+      description: Output of `npm list @coral-xyz/anchor`
+      placeholder: "0.32.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: error-type
+    attributes:
+      label: Error Type
+      description: Which error are you experiencing?
+      options:
+        - "Cannot read properties of undefined (reading '_bn')"
+        - "Account not found: <name>"
+        - "Cannot use 'in' operator to search for 'option'"
+        - "The first argument must be of type string"
+        - Other IDL error
+    validations:
+      required: true
+
+  - type: textarea
+    id: idl-structure
+    attributes:
+      label: IDL Structure
+      description: Relevant parts of your IDL file
+      render: json
+      placeholder: |
+        {
+          "address": "...",
+          "accounts": [...],
+          "types": [...]
+        }
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you tried to fix this?
+      placeholder: |
+        - Ran fix-idl-v0.32.mjs
+        - Checked documentation
+        - etc.
+
+  - type: dropdown
+    id: fix-script
+    attributes:
+      label: Did you try the fix script?
+      description: Have you run the automated fix script?
+      options:
+        - "Yes, it didn't work"
+        - "Yes, it partially worked"
+        - "No, not yet"
+        - "I don't know about the fix script"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: Program name, custom types, etc.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have read the IDL Troubleshooting Guide
+          required: true
+        - label: I have tried the automated fix script
+          required: false
+        - label: I have checked the examples in docs/examples/
+          required: false
+        - label: This is a new error pattern not in the docs
+          required: false

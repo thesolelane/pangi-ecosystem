@@ -1,0 +1,30 @@
+{
+  "name": "pangi-ecosystem",
+  "version": "1.0.0",
+  "description": "PANGI Token Ecosystem - Solana Programs",
+  "private": true,
+  "scripts": {
+    "test:real": "node scripts/test-real-transfer.js",
+    "check:deployment": "./scripts/deployment-checklist.sh",
+    "check:programs": "./scripts/check-program-status.sh",
+    "check:security": "node scripts/verify-security.js",
+    "get:program-ids": "./scripts/get-program-ids.sh",
+    "verify:devnet": "./scripts/verify-devnet.sh",
+    "setup:accounts": "./scripts/setup-token-accounts.sh",
+    "test:transfer": "./scripts/test-token-transfer.sh"
+  },
+  "keywords": [
+    "solana",
+    "anchor",
+    "token",
+    "nft",
+    "defi"
+  ],
+  "author": "PANGI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4"
+  }
+}

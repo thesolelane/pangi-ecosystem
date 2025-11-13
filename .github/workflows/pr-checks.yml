@@ -1,0 +1,146 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check PR title format
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            perf
+            ci
+          requireScope: false
+
+  pr-size:
+    name: Check PR Size
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check PR size
+        run: |
+          FILES_CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
+          LINES_CHANGED=$(git diff --stat origin/${{ github.base_ref }}...HEAD | tail -1 | awk '{print $4+$6}')
+          
+          echo "Files changed: $FILES_CHANGED"
+          echo "Lines changed: $LINES_CHANGED"
+          
+          if [ $FILES_CHANGED -gt 50 ]; then
+            echo "::warning::This PR changes more than 50 files. Consider splitting it."
+          fi
+          
+          if [ $LINES_CHANGED -gt 1000 ]; then
+            echo "::warning::This PR changes more than 1000 lines. Consider splitting it."
+          fi
+
+  pr-labels:
+    name: Check PR Labels
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check for labels
+        uses: mheap/github-action-required-labels@v5
+        with:
+          mode: minimum
+          count: 1
+          labels: "bug, enhancement, documentation, refactor, test, chore"
+          add_comment: true
+
+  test-coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests with coverage
+        run: npm run test:coverage --if-present
+      
+      - name: Check coverage threshold
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "Coverage: $COVERAGE%"
+            
+            if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+              echo "::error::Coverage is below 70%"
+              exit 1
+            fi
+          fi
+
+  idl-validation:
+    name: Validate IDL Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Check IDL format
+        run: |
+          if [ -d target/idl ]; then
+            for idl in target/idl/*.json; do
+              echo "Checking $idl"
+              
+              # Check for required fields
+              jq -e '.address' "$idl" > /dev/null || echo "::warning::Missing address in $idl"
+              jq -e '.instructions' "$idl" > /dev/null || echo "::error::Missing instructions in $idl"
+              jq -e '.accounts' "$idl" > /dev/null || echo "::warning::Missing accounts in $idl"
+              
+              # Validate JSON
+              jq empty "$idl" || echo "::error::Invalid JSON in $idl"
+            done
+          fi
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v3
+        with:
+          fail-on-severity: moderate

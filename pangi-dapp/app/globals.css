@@ -1,0 +1,46 @@
+@import "@solana/wallet-adapter-react-ui/styles.css";
+@import "tailwindcss";
+
+:root {
+  --bg: #0B0D10;
+  --surface: #13161B;
+  --surface2: #1A1F26;
+  --border: #2A313B;
+  --text: #E6E8EB;
+  --muted: #9AA3AE;
+  --purple: #9945FF;
+  --silver-hi: #F3F6F9;
+  --silver-lo: #C9D1D9;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle purple scale pattern background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(18px 18px at 10px 10px, rgba(153,69,255,0.06) 1px, transparent 1px);
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* Ensure content is above pattern */
+body > * {
+  position: relative;
+  z-index: 1;
+}
