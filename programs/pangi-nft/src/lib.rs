@@ -62,6 +62,9 @@ pub mod pangi_nft {
     pub fn initialize_hatchling(
         ctx: Context<InitializeHatchling>,
         evolution_cooldown: i64,
+        series: u8,
+        matching_nft_id: u16,
+        is_special_edition: bool,
     ) -> Result<()> {
         let global_config = &mut ctx.accounts.global_config;
         
@@ -103,9 +106,30 @@ pub mod pangi_nft {
         let hatchling = &mut ctx.accounts.hatchling;
         let clock = Clock::get()?;
         
+        // Validate series
+        require!(series == 1 || series == 2, ErrorCode::InvalidSeries);
+        
+        // For Series 1 (Main Collection), validate matching ID ranges
+        if series == 1 && !is_special_edition {
+            let nft_id = global_config.total_minted as u16;
+            if nft_id <= 1500 {
+                // Hatchling: matching_nft_id should be in adult range (1501-3000)
+                require!(
+                    matching_nft_id > 1500 && matching_nft_id <= 3000,
+                    ErrorCode::InvalidMatchingId
+                );
+            } else {
+                // Adult: matching_nft_id should be in hatchling range (1-1500)
+                require!(
+                    matching_nft_id >= 1 && matching_nft_id <= 1500,
+                    ErrorCode::InvalidMatchingId
+                );
+            }
+        }
+        
         hatchling.nft_mint = ctx.accounts.nft_mint.key();
         hatchling.authority = ctx.accounts.authority.key();
-        hatchling.stage = LifeStage::Egg;
+        hatchling.stage = LifeStage::Hatchling; // Default to Hatchling for Series 1
         hatchling.rarity = Rarity::Common;
         hatchling.evolution_count = 0;
         hatchling.last_evolution_timestamp = clock.unix_timestamp;
@@ -113,6 +137,9 @@ pub mod pangi_nft {
         hatchling.traits = TraitSet::default();
         hatchling.generation = 1;
         hatchling.is_locked = false;
+        hatchling.series = series;
+        hatchling.matching_nft_id = matching_nft_id;
+        hatchling.is_special_edition = is_special_edition;
 
         emit!(HatchlingInitializedEvent {
             nft_mint: hatchling.nft_mint,
@@ -163,29 +190,35 @@ pub mod pangi_nft {
         // Store old stage for event
         let old_stage = hatchling.stage;
 
-        // Evolve based on current stage
-        match hatchling.stage {
-            LifeStage::Egg => {
-                hatchling.stage = LifeStage::Hatchling;
-                hatchling.rarity = calculate_rarity(&ctx.accounts.authority.key(), clock.unix_timestamp)?;
-                hatchling.traits = generate_initial_traits(hatchling.rarity)?;
+        // Evolve based on current stage and series
+        if hatchling.is_special_edition {
+            // Special editions can evolve through all stages
+            match hatchling.stage {
+                LifeStage::Egg => {
+                    hatchling.stage = LifeStage::Hatchling;
+                    hatchling.rarity = calculate_rarity(&ctx.accounts.authority.key(), clock.unix_timestamp)?;
+                    hatchling.traits = generate_initial_traits(hatchling.rarity)?;
+                }
+                LifeStage::Hatchling => {
+                    hatchling.stage = LifeStage::Juvenile;
+                    hatchling.traits = evolve_traits(&hatchling.traits, hatchling.rarity, 1)?;
+                }
+                LifeStage::Juvenile => {
+                    hatchling.stage = LifeStage::Adult;
+                    hatchling.traits = evolve_traits(&hatchling.traits, hatchling.rarity, 2)?;
+                }
+                LifeStage::Adult => {
+                    hatchling.stage = LifeStage::Legendary;
+                    hatchling.rarity = upgrade_rarity(hatchling.rarity)?;
+                    hatchling.traits = evolve_traits(&hatchling.traits, hatchling.rarity, 3)?;
+                }
+                LifeStage::Legendary => {
+                    return Err(ErrorCode::MaxEvolutionReached.into());
+                }
             }
-            LifeStage::Hatchling => {
-                hatchling.stage = LifeStage::Juvenile;
-                hatchling.traits = evolve_traits(&hatchling.traits, hatchling.rarity, 1)?;
-            }
-            LifeStage::Juvenile => {
-                hatchling.stage = LifeStage::Adult;
-                hatchling.traits = evolve_traits(&hatchling.traits, hatchling.rarity, 2)?;
-            }
-            LifeStage::Adult => {
-                hatchling.stage = LifeStage::Legendary;
-                hatchling.rarity = upgrade_rarity(hatchling.rarity)?;
-                hatchling.traits = evolve_traits(&hatchling.traits, hatchling.rarity, 3)?;
-            }
-            LifeStage::Legendary => {
-                return Err(ErrorCode::MaxEvolutionReached.into());
-            }
+        } else {
+            // Series 1 Main Collection: Hatchling → Adult only (no evolution, separate mints)
+            return Err(ErrorCode::MainCollectionNoEvolution.into());
         }
 
         hatchling.last_evolution_timestamp = clock.unix_timestamp;
@@ -407,15 +440,19 @@ pub struct Hatchling {
     pub traits: TraitSet,
     pub generation: u16,
     pub is_locked: bool,
+    pub series: u8,              // 1 = Main Collection, 2 = Special Edition
+    pub matching_nft_id: u16,    // For Series 1: Hatchling #1 ↔ Adult #1501
+    pub is_special_edition: bool, // True for promotional NFTs
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, InitSpace)]
 pub enum LifeStage {
-    Egg,
-    Hatchling,
-    Juvenile,
-    Adult,
-    Legendary,
+    Hatchling,  // Series 1 Part 1 (1500 NFTs)
+    Adult,      // Series 1 Part 2 (1500 NFTs)
+    // Special Editions only:
+    Egg,        // Promotional
+    Juvenile,   // Promotional
+    Legendary,  // Promotional/1-of-1
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, InitSpace)]
@@ -509,4 +546,10 @@ pub enum ErrorCode {
     Underflow,
     #[msg("Division by zero")]
     DivisionByZero,
+    #[msg("Invalid series number (must be 1 or 2)")]
+    InvalidSeries,
+    #[msg("Invalid matching NFT ID for this series")]
+    InvalidMatchingId,
+    #[msg("Main collection NFTs cannot evolve (Hatchling and Adult are separate mints)")]
+    MainCollectionNoEvolution,
 }
