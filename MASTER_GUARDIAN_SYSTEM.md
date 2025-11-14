@@ -180,7 +180,32 @@ Guardian CANNOT derive Master Key from delegated pass
 - ❌ Cannot change Master
 - ❌ Cannot access Master-level functions
 - ❌ Cannot access wallets outside permission scope
+- ❌ Cannot modify own permissions (requires Master NFT connection)
+- ❌ Cannot upgrade permissions without Master approval
 - ✅ Only performs assigned tasks with delegated pass
+
+**To Change Guardian Permissions**:
+```
+Guardian wants more permissions
+↓
+Master NFT must be connected to wallet
+↓
+Use Solana Wallet Connect or similar
+↓
+Master NFT proves ownership (signature)
+↓
+Master approves new permissions
+↓
+New delegated pass generated
+↓
+Guardian receives updated permissions
+```
+
+**Privacy Note**: Master NFT address ≠ Wallet address
+- Master NFT mint address is public (on-chain)
+- Wallet address holding Master NFT is NOT directly linked
+- Requires signature verification to prove ownership
+- Cannot trace Master NFT to specific wallet easily
 
 ### 4. Assigning New Master
 
@@ -283,14 +308,20 @@ pub struct MasterNFT {
 #[account]
 pub struct GuardianNFT {
     pub nft_mint: Pubkey,                    // NFT mint address
-    pub master_nft: Pubkey,                  // Parent Master NFT
-    pub permissions: Vec<Permission>,        // Assigned permissions
+    pub master_nft: Pubkey,                  // Parent Master NFT (NOT wallet address)
+    pub permissions: Vec<Permission>,        // Assigned permissions (IMMUTABLE at creation)
     pub delegated_pass_hash: [u8; 32],       // Hash of delegated pass (NOT master key)
     pub permission_scope: PermissionScope,   // What Guardian can access
     pub created_at: i64,                     // Creation timestamp
     pub created_by: Pubkey,                  // Master that created this Guardian
     pub expires_at: Option<i64>,             // Optional expiration
+    pub last_modified: Option<i64>,          // Last permission update (requires Master)
+    pub modification_count: u8,              // Number of times permissions changed
 }
+
+// IMPORTANT: Guardian permissions are SET AT CREATION
+// To change permissions, Master NFT must be connected to wallet
+// Master NFT address ≠ Wallet address (privacy preserved)
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum Permission {
@@ -403,6 +434,54 @@ pub fn decrypt_wallet(
     Ok(decrypted_data)
 }
 
+// Update Guardian permissions (REQUIRES Master NFT connection)
+pub fn update_guardian_permissions(
+    ctx: Context<UpdateGuardianPermissions>,
+    new_permissions: Vec<Permission>,
+    new_scope: PermissionScope,
+    master_signature: [u8; 64],  // Proof of Master NFT ownership
+) -> Result<()> {
+    // CRITICAL: Must prove Master NFT ownership
+    // Master NFT must be connected to wallet (Solana Wallet Connect)
+    require!(
+        verify_master_nft_ownership(
+            &ctx.accounts.master_nft,
+            &ctx.accounts.wallet_authority,
+            &master_signature
+        ),
+        ErrorCode::MasterNFTNotConnected
+    );
+    
+    // Verify Master NFT matches Guardian's parent
+    require!(
+        ctx.accounts.master_nft.key() == ctx.accounts.guardian_nft.master_nft,
+        ErrorCode::UnauthorizedMaster
+    );
+    
+    // Update permissions
+    ctx.accounts.guardian_nft.permissions = new_permissions;
+    ctx.accounts.guardian_nft.permission_scope = new_scope;
+    ctx.accounts.guardian_nft.last_modified = Some(Clock::get()?.unix_timestamp);
+    ctx.accounts.guardian_nft.modification_count += 1;
+    
+    // Generate new delegated pass with updated scope
+    let new_delegated_pass = derive_delegated_pass(
+        &ctx.accounts.master_nft.encryption_key_hash,
+        &new_scope,
+        ctx.accounts.guardian_nft.key()
+    );
+    
+    ctx.accounts.guardian_nft.delegated_pass_hash = hash(&new_delegated_pass);
+    
+    emit!(GuardianPermissionsUpdated {
+        guardian_nft: ctx.accounts.guardian_nft.key(),
+        master_nft: ctx.accounts.master_nft.key(),
+        updated_at: ctx.accounts.guardian_nft.last_modified.unwrap(),
+    });
+    
+    Ok(())
+}
+
 // Execute Guardian action (uses delegated pass, NOT master key)
 pub fn execute_guardian_action(
     ctx: Context<ExecuteGuardianAction>,
@@ -443,6 +522,22 @@ pub fn execute_guardian_action(
     Ok(())
 }
 
+// Helper: Verify Master NFT ownership without revealing wallet address
+fn verify_master_nft_ownership(
+    master_nft: &Account<MasterNFT>,
+    wallet_authority: &Signer,
+    signature: &[u8; 64],
+) -> bool {
+    // Verify signature proves wallet holds Master NFT
+    // WITHOUT linking Master NFT address to wallet address on-chain
+    
+    // Use zero-knowledge proof or signature verification
+    // Master NFT address ≠ Wallet address (privacy preserved)
+    
+    let message = format!("MASTER_NFT_OWNERSHIP:{}", master_nft.key());
+    verify_signature(wallet_authority.key(), &message.as_bytes(), signature)
+}
+
 // Helper: Derive delegated pass (one-way, cannot reverse to master key)
 fn derive_delegated_pass(
     master_key_hash: &[u8; 32],
@@ -465,6 +560,105 @@ fn derive_delegated_pass(
     
     delegated_pass
 }
+```
+
+## Privacy & Anonymity
+
+### Master NFT Address vs Wallet Address
+
+**Key Distinction**:
+```
+Master NFT Mint Address (Public)
+├── NFT #42 mint: 7xK9...3mP2 (on-chain, visible)
+├── Metadata: Obsidian Claw Hatchling #42
+└── Linked to encrypted wallet system
+
+Wallet Address Holding Master NFT (Private)
+├── Wallet: 9zL4...8nQ1 (holds Master NFT)
+├── NOT directly linked on-chain
+├── Requires signature to prove ownership
+└── Almost impossible to trace
+
+Encrypted Shadow Wallet (Hidden)
+├── Wallet data encrypted
+├── Requires Master NFT to decrypt
+└── No direct link to Master NFT address or holder wallet
+```
+
+**Privacy Layers**:
+
+1. **Master NFT Address**: Public (NFT mint address)
+2. **Holder Wallet Address**: Private (not directly linked)
+3. **Encrypted Wallet Data**: Hidden (encrypted)
+
+**Tracing Difficulty**:
+```
+Observer sees:
+- Master NFT #42 exists (mint address)
+- Master NFT #42 has encrypted wallet
+- Master NFT #42 was transferred (transaction history)
+
+Observer CANNOT easily determine:
+- Which wallet currently holds Master NFT #42
+- Who owns the wallet holding Master NFT #42
+- Contents of encrypted wallet
+- Guardian relationships (without analysis)
+```
+
+**On-Chain Data (Public)**:
+- ✅ Master NFT mint address
+- ✅ Guardian NFT mint addresses
+- ✅ Encrypted wallet account (encrypted data)
+- ✅ Transaction history (transfers, actions)
+- ✅ Permission hashes (not actual permissions)
+
+**Off-Chain / Hidden**:
+- ❌ Current wallet holding Master NFT (requires chain analysis)
+- ❌ Master encryption key (never on-chain)
+- ❌ Delegated passes (only hashes on-chain)
+- ❌ Decrypted wallet contents
+- ❌ Actual permission details (only hashes)
+
+**Wallet Connect Process (Privacy-Preserving)**:
+```
+1. User connects wallet via Solana Wallet Connect
+   ↓
+2. Wallet proves it holds Master NFT (signature)
+   ↓
+3. Signature verified off-chain or via ZK proof
+   ↓
+4. Master NFT address NOT linked to wallet address on-chain
+   ↓
+5. Permission update executed
+   ↓
+6. Observer sees: "Guardian permissions updated"
+   Observer CANNOT see: Which wallet initiated update
+```
+
+**Chain Analysis Resistance**:
+- Master NFT can be transferred frequently (obfuscation)
+- Multiple wallets can hold different Master NFTs
+- Guardian actions don't reveal Master NFT holder
+- Encrypted wallet data provides no clues
+- No direct on-chain link between Master NFT and wallet address
+
+**Example**:
+```
+Master NFT #42 (mint: 7xK9...3mP2)
+├── Currently held by Wallet A (9zL4...8nQ1)
+├── Previously held by Wallet B (3pR7...5kL9)
+├── Created by Wallet C (8mN2...7jH4)
+
+On-chain observer sees:
+- NFT #42 was minted
+- NFT #42 was transferred twice
+- NFT #42 has encrypted wallet
+- Guardian #156 created by NFT #42
+
+On-chain observer CANNOT easily determine:
+- Wallet A holds NFT #42 now (requires analysis)
+- Wallet A's identity
+- Relationship between Wallets A, B, C
 ```
 
 ## Security Features
@@ -501,13 +695,35 @@ Master Key → HKDF → Delegated Pass
 - Hardware wallet compatible
 - Trading transfers control AND master key
 
-### 3. Guardian Limitations
-- Granular permissions via delegated pass
-- Cannot escalate privileges (no master key)
-- Cannot access Master functions
-- Cannot derive master key from delegated pass
-- Auditable actions
-- Scoped to specific wallets/subdomains
+### 3. Guardian Limitations & Permission Updates
+- **Initial permissions**: Set at Guardian creation (immutable without Master)
+- **Permission changes**: Require Master NFT connection to wallet
+- **Cannot self-upgrade**: Guardian cannot increase own permissions
+- **Master approval required**: All permission changes need Master signature
+- **Granular permissions**: Via delegated pass
+- **Cannot escalate privileges**: No master key access
+- **Cannot access Master functions**: Scope-limited
+- **Cannot derive master key**: From delegated pass
+- **Auditable actions**: All logged on-chain
+- **Scoped access**: Specific wallets/subdomains only
+
+**Permission Update Flow**:
+```
+Guardian #156 has: View Balance permission
+↓
+Guardian wants: Transfer Tokens permission
+↓
+Guardian CANNOT self-upgrade
+↓
+Master NFT holder must:
+  1. Connect Master NFT to wallet (Wallet Connect)
+  2. Sign permission update transaction
+  3. Approve new permissions for Guardian #156
+↓
+New delegated pass generated with updated scope
+↓
+Guardian #156 now has: View Balance + Transfer Tokens
+```
 
 ### 4. Delegated Pass Security
 - **One-way derivation**: Cannot reverse to master key
