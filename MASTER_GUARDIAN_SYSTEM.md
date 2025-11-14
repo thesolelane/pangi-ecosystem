@@ -1078,13 +1078,180 @@ Master revokes all compromised passes
 Master key remains secure
 ```
 
+## Seed Phrase & Recovery
+
+### What User Receives at Master NFT Creation
+
+```
+Master NFT Minted
+↓
+User receives:
+1. 24-word seed phrase (BIP39 standard) - CRITICAL BACKUP
+2. Private key (derived from seed phrase)
+3. Public key / Wallet address (derived from private key)
+4. Master NFT mint address (public identifier)
+5. Master encryption key (for shadow wallet)
+```
+
+**Key Hierarchy**:
+```
+24-word seed phrase (user must backup)
+  ↓ derives
+Private key (secret)
+  ↓ derives
+Public key / Wallet address (can share)
+  ↓ controls
+Master NFT
+  ↓ holds
+Master encryption key
+  ↓ decrypts
+Shadow wallet
+```
+
+### User Experience
+
+**Daily Use**:
+- User doesn't need to know/remember wallet address
+- Master NFT in wallet = automatic access
+- Guardians handle routine operations
+- Seamless experience
+
+**Recovery**:
+- User imports 24-word seed phrase
+- Wallet address automatically derived
+- Master NFT automatically accessible
+- Full access restored
+
+### Seed Phrase Requirements
+
+- ✅ **Minimum 24 words** (BIP39 standard)
+- ✅ Generated at Master NFT creation
+- ✅ Recovers entire wallet + Master NFT
+- ✅ Must be stored securely offline
+- ⚠️ **Anyone with seed phrase = full access**
+
+### Recovery Process
+
+**Seed Phrase Recovery (Primary Method)**:
+```
+User loses device/wallet
+↓
+User has 24-word seed phrase (written down, stored securely)
+↓
+Import seed phrase into new wallet
+↓
+Wallet restored with:
+  - Private key
+  - Public key (wallet address)
+  - Master NFT
+  - All encrypted wallet access
+↓
+User regains full access
+```
+
+### Seed Phrase Security
+
+**DO**:
+- ✅ Write seed phrase on paper immediately
+- ✅ Verify all 24 words are correct
+- ✅ Store in multiple secure physical locations
+- ✅ Use metal backup for fire/water resistance
+- ✅ Test recovery process with small amount first
+- ✅ Keep seed phrase separate from device
+- ✅ Consider Shamir's Secret Sharing for inheritance
+
+**DON'T**:
+- ❌ Take photo of seed phrase
+- ❌ Store in cloud (Google Drive, iCloud, Dropbox)
+- ❌ Email seed phrase to yourself
+- ❌ Store in password manager
+- ❌ Share with anyone (even family, unless inheritance plan)
+- ❌ Store on computer or phone
+- ❌ Type seed phrase on any device (keyloggers)
+
+### Backup Strategy (Recommended)
+
+```
+Primary Backup:
+- Write 24-word seed phrase on paper
+- Store in fireproof safe at home
+
+Secondary Backup:
+- Write 24-word seed phrase on metal plate
+- Store in bank safe deposit box
+
+Tertiary Backup (Optional):
+- Split seed phrase (Shamir's Secret Sharing)
+- Distribute to 3 trusted parties (2-of-3 required)
+```
+
+### Recovery Test
+
+```
+After creating Master NFT:
+1. Write down 24-word seed phrase
+2. Send small amount (0.01 SOL) to wallet
+3. Delete wallet from device
+4. Import using seed phrase
+5. Verify you can access the 0.01 SOL
+6. If successful: Your backup works
+7. If failed: Re-check seed phrase and try again
+```
+
+### Critical Warning
+
+```
+╔═══════════════════════════════════════════════════════════╗
+║                    ⚠️  CRITICAL WARNING ⚠️                 ║
+║                                                           ║
+║  PANGI is a SELF-CUSTODY protocol.                       ║
+║                                                           ║
+║  If you lose your 24-WORD SEED PHRASE:                   ║
+║  • Your wallet is encrypted forever                      ║
+║  • PANGI CANNOT recover it                               ║
+║  • Your funds are LOST PERMANENTLY                       ║
+║  • Your documents are INACCESSIBLE                       ║
+║  • Your Master NFT is GONE                               ║
+║                                                           ║
+║  PROTECT YOUR SEED PHRASE:                               ║
+║  ✓ Write down all 24 words (in order)                    ║
+║  ✓ Store in fireproof safe                               ║
+║  ✓ Keep backup in bank safe deposit box                  ║
+║  ✓ NEVER store digitally (no photos, no cloud)           ║
+║  ✓ NEVER share with anyone (including PANGI)             ║
+║  ✓ Use Guardians for daily operations                    ║
+║                                                           ║
+║  WHAT YOU RECEIVE AT CREATION:                           ║
+║  • 24-word seed phrase (BACKUP THIS!)                    ║
+║  • Private key (derived from seed phrase)                ║
+║  • Public key / Wallet address (derived from private)    ║
+║  • Master NFT (controlled by private key)                ║
+║                                                           ║
+║  YOU DON'T NEED TO MEMORIZE WALLET ADDRESS               ║
+║  You only need the 24-word seed phrase for recovery      ║
+║                                                           ║
+║  NOT YOUR KEYS = NOT YOUR CRYPTO                         ║
+║  NOT YOUR SEED PHRASE = NOT YOUR WALLET                  ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
 ## Conclusion
 
 The Master/Guardian system transforms NFTs from collectibles into functional cryptographic keys, creating:
 - **Utility**: Every NFT has purpose
-- **Security**: Encrypted wallet protection
-- **Flexibility**: Granular permission control
-- **Engagement**: Incentivized minting
-- **Innovation**: Novel NFT use case
+- **Security**: Encrypted wallet protection with 24-word seed phrase backup
+- **Flexibility**: Granular permission control via delegated passes
+- **Engagement**: Incentivized minting for Guardians and matching pairs
+- **Innovation**: Novel NFT use case with self-custody
+- **Privacy**: Master NFT address ≠ wallet address
+- **Recovery**: User-controlled via 24-word seed phrase
 
-This system makes PANGI NFTs essential tools, not just art.
+**Key Principles**:
+- User receives 24-word seed phrase at Master NFT creation
+- Seed phrase = complete access (backup critical)
+- User doesn't need to know wallet address for daily use
+- Guardians use delegated passes (NOT master key)
+- Master NFT can be stored offline (cold wallet)
+- PANGI cannot recover lost seed phrases
+
+This system makes PANGI NFTs essential tools, not just art, while maintaining true self-custody.
