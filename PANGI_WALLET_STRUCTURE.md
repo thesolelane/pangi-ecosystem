@@ -353,6 +353,136 @@ education/
 └── student_credentials/
 ```
 
+## Critical: Self-Custody & No Recovery
+
+### PANGI.sol Authority vs User Custody
+
+**PANGI.sol is the ROOT authority for**:
+- ✅ Protocol rules and parameters
+- ✅ Subdomain limit increases
+- ✅ Wallet structure governance
+- ✅ System upgrades and features
+- ✅ Smart contract logic
+
+**PANGI.sol has ZERO authority over**:
+- ❌ User wallet contents
+- ❌ User encryption keys
+- ❌ User Master NFTs
+- ❌ User documents or funds
+- ❌ Wallet recovery
+
+### Self-Custody Model
+
+**Users have COMPLETE control**:
+- ✅ Master NFT = User's key
+- ✅ Encryption keys = User's responsibility
+- ✅ Wallet access = User's Master NFT
+- ✅ Recovery = User's backup strategy
+- ✅ Security = User's cold storage
+
+**PANGI CANNOT and WILL NOT**:
+- ❌ Recover lost Master NFTs
+- ❌ Decrypt user wallets
+- ❌ Access user documents
+- ❌ Retrieve user funds
+- ❌ Reset user passwords/keys
+- ❌ Provide wallet recovery services
+
+### User Responsibility
+
+**If Master NFT is lost**:
+```
+Master NFT lost/stolen/destroyed
+↓
+Wallet remains encrypted forever
+↓
+NO RECOVERY POSSIBLE
+↓
+User loses access permanently
+```
+
+**PANGI's position**: "Not your keys, not your crypto" - We cannot help if you lose your Master NFT.
+
+### Cold Storage Strategy (Recommended)
+
+**Setup Process**:
+```
+1. Mint Master NFT
+   ↓
+2. Create Guardian NFTs for daily operations
+   ↓
+3. Assign Guardian permissions
+   ↓
+4. Transfer Master NFT to cold wallet (hardware wallet)
+   ↓
+5. Store cold wallet securely offline
+   ↓
+6. Use Guardians for day-to-day activities
+   ↓
+7. Only access Master NFT for critical changes
+```
+
+**Benefits**:
+- ✅ Master NFT safe offline
+- ✅ Guardians handle daily tasks
+- ✅ Reduced exposure to theft/loss
+- ✅ User maintains full control
+- ✅ No third-party custody
+
+**Example**:
+```
+User stores Master NFT #42 in Ledger hardware wallet
+↓
+Ledger stored in safe deposit box
+↓
+Guardian #1 (hot wallet): View balances, transfer up to 1000 PANGI
+Guardian #2 (hot wallet): Manage Collections display
+Guardian #3 (hot wallet): Execute routine transactions
+↓
+Master NFT only needed for:
+  - Creating new Guardians
+  - Assigning new Master
+  - Accessing Documents/Medical/ID wallets
+  - Major fund movements
+```
+
+### Recovery Options (User-Controlled)
+
+**Option 1: Master NFT Backup**
+```
+User backs up Master NFT private key
+↓
+Stores backup in secure location (safe, vault)
+↓
+If device lost: Import Master NFT from backup
+↓
+User regains access
+```
+
+**Option 2: Multi-Signature Master**
+```
+User creates 2-of-3 multisig Master NFT
+↓
+Distributes keys to trusted parties
+↓
+If one key lost: Use other 2 keys to recover
+↓
+User regains access
+```
+
+**Option 3: Dead Man's Switch**
+```
+User sets up time-locked Guardian promotion
+↓
+If Master NFT not accessed for X months
+↓
+Guardian automatically promoted to Master
+↓
+Heir/beneficiary gains access
+```
+
+**IMPORTANT**: All recovery options are USER-CONTROLLED. PANGI has no role in recovery.
+
 ## PANGI.sol Governance
 
 ### Smart Contract Structure
@@ -728,14 +858,50 @@ Master NFT #42 Backup:
 └── custom_2_wallet.backup.enc
 ```
 
-### Recovery Process
+### Recovery Process (USER-INITIATED ONLY)
 
-1. Verify Master NFT ownership
-2. Decrypt master key with recovery phrase
-3. Restore wallet structure from backup
-4. Decrypt individual wallets
-5. Verify data integrity
-6. Restore name registry entries
+**PANGI CANNOT HELP WITH RECOVERY**
+
+User must have:
+- ✅ Master NFT (physical possession)
+- ✅ Master NFT private key backup
+- ✅ Recovery phrase (if using seed phrase backup)
+- ✅ Wallet backup files (optional, for data recovery)
+
+**Recovery Steps (User performs alone)**:
+1. Locate Master NFT or import from backup
+2. Verify Master NFT ownership in wallet
+3. Decrypt master key with user's recovery phrase
+4. Restore wallet structure from user's backup
+5. Decrypt individual wallets using Master NFT
+6. Verify data integrity
+7. Restore name registry entries
+
+**If user loses Master NFT and has no backup**:
+- ❌ Wallet is permanently encrypted
+- ❌ No recovery possible
+- ❌ PANGI cannot help
+- ❌ Funds/documents lost forever
+
+**User Responsibility Disclaimer**:
+```
+⚠️ WARNING ⚠️
+
+PANGI is a self-custody protocol. We do NOT:
+- Store your Master NFT
+- Hold your encryption keys
+- Have access to your wallets
+- Provide recovery services
+- Act as custodian
+
+YOU are responsible for:
+- Securing your Master NFT
+- Backing up your keys
+- Storing recovery phrases
+- Protecting your assets
+
+LOST MASTER NFT = LOST ACCESS FOREVER
+```
 
 ## Compliance & Privacy
 
@@ -753,14 +919,92 @@ Master NFT #42 Backup:
 - **Encrypted Storage**: All data encrypted at rest
 - **Access Logs**: Audit trail of all access
 
+## Custody Model Summary
+
+### PANGI.sol Role (Protocol Governance)
+```
+┌─────────────────────────────────────┐
+│         PANGI.sol (Root)            │
+│                                     │
+│  Controls:                          │
+│  • Protocol rules                   │
+│  • Subdomain limits                 │
+│  • System upgrades                  │
+│  • Smart contract logic             │
+│                                     │
+│  Does NOT control:                  │
+│  • User wallets                     │
+│  • User keys                        │
+│  • User funds                       │
+│  • User documents                   │
+│  • Recovery services                │
+└─────────────────────────────────────┘
+```
+
+### User Role (Self-Custody)
+```
+┌─────────────────────────────────────┐
+│         User (Owner)                │
+│                                     │
+│  Controls:                          │
+│  • Master NFT                       │
+│  • Encryption keys                  │
+│  • Wallet contents                  │
+│  • Guardian permissions             │
+│  • Recovery strategy                │
+│                                     │
+│  Responsible for:                   │
+│  • Securing Master NFT              │
+│  • Backing up keys                  │
+│  • Cold storage                     │
+│  • Guardian management              │
+│  • Loss prevention                  │
+└─────────────────────────────────────┘
+```
+
+### Key Principles
+
+1. **Self-Custody**: Users own and control their wallets completely
+2. **No Recovery**: PANGI cannot recover lost Master NFTs or wallets
+3. **User Responsibility**: Users must secure their own Master NFTs
+4. **Cold Storage**: Master NFTs can be stored offline for maximum security
+5. **Guardian System**: Enables daily operations without exposing Master NFT
+6. **Protocol Governance**: PANGI.sol governs rules, not user assets
+
 ## Conclusion
 
 The PANGI wallet structure provides:
-- **Organization**: 5 required + 2 custom wallets
-- **Security**: Multi-layer encryption
-- **Privacy**: Sensitive data protection
-- **Flexibility**: Custom subdomains for user needs
-- **Compliance**: Regulatory requirements met
-- **Governance**: PANGI.sol smart contract control
+- **Organization**: 5 required + 2 custom + 2 reserved wallets
+- **Security**: Multi-layer encryption, cold storage support
+- **Privacy**: Sensitive data protection, zero-knowledge proofs
+- **Flexibility**: Custom subdomains, Guardian delegation
+- **Self-Custody**: Complete user control, no third-party access
+- **No Recovery**: User responsibility, PANGI cannot help with lost keys
+- **Governance**: PANGI.sol controls protocol, not user assets
+- **Compliance**: HIPAA, GDPR, KYC/AML compatible
 
-This creates a comprehensive, secure, and organized digital asset management system.
+**This creates a comprehensive, secure, self-custodial digital asset management system where users maintain complete control and responsibility.**
+
+### Final Warning
+
+```
+╔═══════════════════════════════════════════════════════════╗
+║                    ⚠️  CRITICAL WARNING ⚠️                 ║
+║                                                           ║
+║  PANGI is a SELF-CUSTODY protocol.                       ║
+║                                                           ║
+║  If you lose your Master NFT:                            ║
+║  • Your wallet is encrypted forever                      ║
+║  • PANGI CANNOT recover it                               ║
+║  • Your funds are LOST PERMANENTLY                       ║
+║  • Your documents are INACCESSIBLE                       ║
+║                                                           ║
+║  PROTECT YOUR MASTER NFT:                                ║
+║  ✓ Store in cold wallet (hardware wallet)                ║
+║  ✓ Keep backup of private keys                           ║
+║  ✓ Use Guardians for daily operations                    ║
+║  ✓ Never share your Master NFT                           ║
+║                                                           ║
+║  NOT YOUR KEYS = NOT YOUR CRYPTO                         ║
+╚═══════════════════════════════════════════════════════════╝
+```
