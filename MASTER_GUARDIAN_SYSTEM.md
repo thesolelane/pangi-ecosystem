@@ -87,19 +87,86 @@ A revolutionary NFT-based wallet custody and permission system where NFTs act as
 ```
 User → Mint Hatchling #42
 ↓
+System generates:
+  1. 24-word seed phrase (BIP39)
+  2. Private key (from seed phrase)
+  3. Public key / Wallet address (from private key)
+  4. Master encryption key (for shadow wallet)
+↓
 System creates encrypted shadow wallet
 ↓
 Hatchling #42 = Master NFT (holds encryption key)
 ↓
-User receives Master NFT + encrypted wallet
+User receives:
+  • Master NFT (Hatchling #42)
+  • 24-word seed phrase (MUST BACKUP)
+  • Private key (derived from seed)
+  • Public key / Wallet address (derived from private)
+  • Encrypted wallet access
+```
+
+**What User Must Do Immediately**:
+```
+1. Write down 24-word seed phrase
+   ↓
+2. Verify all 24 words are correct
+   ↓
+3. Store seed phrase in safe location
+   ↓
+4. Create backup copy in second location
+   ↓
+5. NEVER share seed phrase with anyone
+   ↓
+6. User can now use Master NFT
+```
+
+**What User Receives (Example)**:
+```
+Master NFT: Hatchling #42
+Mint Address: 7xK9...3mP2 (public, can share)
+
+Seed Phrase (24 words - NEVER SHARE):
+1. abandon    7. genuine   13. quality   19. venture
+2. ability    8. girl      14. quantum   20. verify
+3. able       9. give      15. quarter   21. very
+4. about     10. glad      16. question  22. veteran
+5. above     11. glance    17. quick     23. viable
+6. absent    12. global    18. quit      24. vibrant
+
+Private Key (derived from seed - NEVER SHARE):
+5J3mBbAH58CpQ3Y2hnHkxFxtp38Xja3kFmuZhTgLvyTL...
+
+Public Key / Wallet Address (can share):
+9zL4mN8pR2kS7vX3wY6tQ1uH5jK9nM4bC8dF2gL7...
+
+Master Encryption Key (for shadow wallet - NEVER SHARE):
+a7f3c9e2d8b4f1a6c5e9d3b7f2a8c4e1d9b6f3a7...
 ```
 
 **What happens**:
 - Random NFT minted (Hatchling or Adult)
-- New encrypted wallet created
+- 24-word seed phrase generated (BIP39 standard)
+- Private key derived from seed phrase
+- Public key (wallet address) derived from private key
+- New encrypted shadow wallet created
 - NFT becomes Master (first NFT = Master)
-- Encryption key embedded in Master NFT metadata
-- User needs Master NFT + TOC to access wallet
+- Master encryption key embedded in Master NFT
+- User needs Master NFT + seed phrase for full control
+
+**User Experience**:
+```
+Daily Use:
+- User doesn't need to remember wallet address
+- Master NFT in wallet = automatic access
+- Guardians handle routine tasks
+- Seamless experience
+
+Recovery:
+- User imports 24-word seed phrase
+- Wallet address automatically derived
+- Master NFT automatically accessible
+- Full access restored
+```
 
 ### 2. Accessing Wallet
 
