@@ -128,26 +128,59 @@ User (holds Master #42) → Mint new NFT
 ↓
 New NFT minted (e.g., Hatchling #156)
 ↓
-User assigns limited permissions
+Master generates delegated pass (NOT master key)
+↓
+Master assigns limited permissions + delegated pass
 ↓
 Hatchling #156 = Guardian NFT
 ↓
 Guardian can perform assigned tasks only
 ```
 
+**Key Distinction - Delegated Pass vs Master Key**:
+
+```
+Master NFT #42:
+├── Master Encryption Key (NEVER shared)
+│   └── Decrypts entire shadow wallet
+│
+└── Delegated Passes (Generated for Guardians)
+    ├── Guardian Pass #1 → View Funds only
+    ├── Guardian Pass #2 → Transfer up to 1000 PANGI
+    └── Guardian Pass #3 → Manage Collections subdomain
+```
+
+**How Delegated Passes Work**:
+```
+Master Key = Full access to encrypted wallet
+     ↓
+Master generates derived key (one-way)
+     ↓
+Delegated Pass = Limited scope key
+     ↓
+Guardian receives delegated pass
+     ↓
+Guardian can ONLY access permitted scope
+     ↓
+Guardian CANNOT derive Master Key from delegated pass
+```
+
 **Guardian Permissions** (examples):
-- View wallet balance (read-only)
-- Transfer tokens (up to limit)
-- Manage subdomains
-- Execute specific transactions
-- Access certain data
+- View wallet balance (read-only with delegated pass)
+- Transfer tokens (up to limit, using delegated pass)
+- Manage specific subdomains (scoped access)
+- Execute specific transactions (pre-approved types)
+- Access certain data (limited scope)
 
 **Guardian Limitations**:
-- ❌ Cannot decrypt full wallet
+- ❌ Cannot decrypt full wallet (no master key)
+- ❌ Cannot access master encryption key
+- ❌ Cannot derive master key from delegated pass
 - ❌ Cannot create other Guardians
 - ❌ Cannot change Master
 - ❌ Cannot access Master-level functions
-- ✅ Only performs assigned tasks
+- ❌ Cannot access wallets outside permission scope
+- ✅ Only performs assigned tasks with delegated pass
 
 ### 4. Assigning New Master
 
@@ -249,11 +282,14 @@ pub struct MasterNFT {
 ```rust
 #[account]
 pub struct GuardianNFT {
-    pub nft_mint: Pubkey,              // NFT mint address
-    pub master_nft: Pubkey,            // Parent Master NFT
-    pub permissions: Vec<Permission>,  // Assigned permissions
-    pub created_at: i64,               // Creation timestamp
-    pub created_by: Pubkey,            // Master that created this Guardian
+    pub nft_mint: Pubkey,                    // NFT mint address
+    pub master_nft: Pubkey,                  // Parent Master NFT
+    pub permissions: Vec<Permission>,        // Assigned permissions
+    pub delegated_pass_hash: [u8; 32],       // Hash of delegated pass (NOT master key)
+    pub permission_scope: PermissionScope,   // What Guardian can access
+    pub created_at: i64,                     // Creation timestamp
+    pub created_by: Pubkey,                  // Master that created this Guardian
+    pub expires_at: Option<i64>,             // Optional expiration
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -263,6 +299,15 @@ pub enum Permission {
     ManageSubdomains,
     ExecuteTransaction { tx_type: String },
     ReadData { data_type: String },
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct PermissionScope {
+    pub can_access_funds: bool,              // Access to Funds wallet
+    pub can_view_collections: bool,          // View Collections wallet
+    pub can_manage_subdomains: Vec<String>,  // Specific subdomains only
+    pub max_transaction_amount: u64,         // Transaction limit
+    pub allowed_operations: Vec<String>,     // Specific operations only
 }
 ```
 
@@ -286,56 +331,192 @@ pub struct EncryptedWallet {
 // Create Master NFT with encrypted wallet
 pub fn initialize_master(
     ctx: Context<InitializeMaster>,
-    encryption_key: [u8; 32],
+    master_encryption_key: [u8; 32],  // Master key (NEVER shared)
     toc_version: u8,
-) -> Result<()>
+) -> Result<()> {
+    // Store hash of master key, not the key itself
+    let master_key_hash = hash(&master_encryption_key);
+    // Master key stays with Master NFT holder only
+}
 
-// Create Guardian NFT with permissions
+// Create Guardian NFT with delegated pass
 pub fn create_guardian(
     ctx: Context<CreateGuardian>,
     permissions: Vec<Permission>,
-) -> Result<()>
+    permission_scope: PermissionScope,
+) -> Result<()> {
+    // Verify caller holds Master NFT
+    require!(
+        ctx.accounts.master_nft_holder.key() == ctx.accounts.master_nft.authority,
+        ErrorCode::Unauthorized
+    );
+    
+    // Generate delegated pass (derived from master key, one-way)
+    let delegated_pass = derive_delegated_pass(
+        &ctx.accounts.master_nft.encryption_key_hash,
+        &permission_scope,
+        ctx.accounts.guardian_nft.key()
+    );
+    
+    // Store delegated pass hash (NOT master key)
+    ctx.accounts.guardian_nft.delegated_pass_hash = hash(&delegated_pass);
+    ctx.accounts.guardian_nft.permissions = permissions;
+    ctx.accounts.guardian_nft.permission_scope = permission_scope;
+    
+    // Master key NEVER leaves Master NFT
+    Ok(())
+}
 
-// Assign new Master NFT
+// Assign new Master NFT (transfers master key)
 pub fn assign_new_master(
     ctx: Context<AssignNewMaster>,
     new_master_nft: Pubkey,
-) -> Result<()>
+) -> Result<()> {
+    // Only current Master can assign new Master
+    // Master encryption key transferred to new Master NFT
+    // Old Master loses master key, becomes regular NFT or Guardian
+}
 
-// Decrypt wallet (requires Master NFT)
+// Decrypt wallet (requires Master NFT with master key)
 pub fn decrypt_wallet(
     ctx: Context<DecryptWallet>,
-    encryption_key: [u8; 32],
-) -> Result<Vec<u8>>
+    master_encryption_key: [u8; 32],  // Must provide master key
+) -> Result<Vec<u8>> {
+    // Verify Master NFT ownership
+    require!(
+        ctx.accounts.nft_holder.key() == ctx.accounts.master_nft.authority,
+        ErrorCode::Unauthorized
+    );
+    
+    // Verify master key matches
+    require!(
+        hash(&master_encryption_key) == ctx.accounts.master_nft.encryption_key_hash,
+        ErrorCode::InvalidKey
+    );
+    
+    // Decrypt full wallet with master key
+    let decrypted_data = decrypt_aes256(
+        &ctx.accounts.encrypted_wallet.encrypted_data,
+        &master_encryption_key
+    );
+    
+    Ok(decrypted_data)
+}
 
-// Execute Guardian action
+// Execute Guardian action (uses delegated pass, NOT master key)
 pub fn execute_guardian_action(
     ctx: Context<ExecuteGuardianAction>,
     action: Permission,
-) -> Result<()>
+    delegated_pass: [u8; 32],  // Delegated pass (NOT master key)
+) -> Result<()> {
+    // Verify Guardian NFT ownership
+    require!(
+        ctx.accounts.nft_holder.key() == ctx.accounts.guardian_nft.authority,
+        ErrorCode::Unauthorized
+    );
+    
+    // Verify delegated pass matches
+    require!(
+        hash(&delegated_pass) == ctx.accounts.guardian_nft.delegated_pass_hash,
+        ErrorCode::InvalidPass
+    );
+    
+    // Verify action is within permissions
+    require!(
+        ctx.accounts.guardian_nft.permissions.contains(&action),
+        ErrorCode::PermissionDenied
+    );
+    
+    // Execute action with LIMITED scope (no master key access)
+    match action {
+        Permission::ViewBalance => {
+            // Can view balance using delegated pass
+            // Cannot decrypt full wallet
+        },
+        Permission::TransferTokens { max_amount } => {
+            // Can transfer up to limit using delegated pass
+            // Cannot access master key
+        },
+        _ => {}
+    }
+    
+    Ok(())
+}
+
+// Helper: Derive delegated pass (one-way, cannot reverse to master key)
+fn derive_delegated_pass(
+    master_key_hash: &[u8; 32],
+    scope: &PermissionScope,
+    guardian_pubkey: Pubkey,
+) -> [u8; 32] {
+    // Use HKDF (HMAC-based Key Derivation Function)
+    // Input: master_key_hash + scope + guardian_pubkey
+    // Output: delegated_pass (cannot derive master key from this)
+    
+    let mut hasher = Sha256::new();
+    hasher.update(master_key_hash);
+    hasher.update(&scope.try_to_vec().unwrap());
+    hasher.update(guardian_pubkey.as_ref());
+    hasher.update(b"GUARDIAN_DELEGATED_PASS");
+    
+    let result = hasher.finalize();
+    let mut delegated_pass = [0u8; 32];
+    delegated_pass.copy_from_slice(&result);
+    
+    delegated_pass
+}
 ```
 
 ## Security Features
 
-### 1. Encryption
-- All wallet data encrypted at rest
-- AES-256-GCM or similar
-- Key derived from Master NFT
-- TOC adds additional security layer
+### 1. Encryption Hierarchy
+```
+Master Encryption Key (Level 1)
+├── Held ONLY by Master NFT holder
+├── Decrypts entire shadow wallet
+├── NEVER shared with Guardians
+└── NEVER stored on-chain (only hash)
+
+Delegated Passes (Level 2)
+├── Derived from Master Key (one-way)
+├── Given to Guardian NFTs
+├── Limited scope access only
+├── Cannot derive Master Key
+└── Can be revoked by Master
+```
+
+**Key Derivation (One-Way)**:
+```
+Master Key → HKDF → Delegated Pass
+                ↓
+         Cannot reverse
+                ↓
+    Delegated Pass ✗→ Master Key
+```
 
 ### 2. Master NFT as Key
 - Physical possession required
+- Master encryption key stays with holder
 - Can be stored offline (cold storage)
 - Hardware wallet compatible
-- Trading transfers control
+- Trading transfers control AND master key
 
 ### 3. Guardian Limitations
-- Granular permissions
-- Cannot escalate privileges
+- Granular permissions via delegated pass
+- Cannot escalate privileges (no master key)
 - Cannot access Master functions
+- Cannot derive master key from delegated pass
 - Auditable actions
+- Scoped to specific wallets/subdomains
 
-### 4. TOC (Terms of Control)
+### 4. Delegated Pass Security
+- **One-way derivation**: Cannot reverse to master key
+- **Scope-limited**: Only accesses permitted wallets
+- **Revocable**: Master can revoke at any time
+- **Expirable**: Optional time-based expiration
+- **Auditable**: All Guardian actions logged
+
+### 5. TOC (Terms of Control)
 - Additional decryption rules
 - Time-based access
 - Multi-signature requirements
@@ -347,28 +528,52 @@ pub fn execute_guardian_action(
 ```
 User mints Master NFT
 ↓
-Transfers Master to hardware wallet
+Master NFT holds master encryption key
 ↓
-Wallet data encrypted and secure
+User creates Guardians with delegated passes
 ↓
-Guardians handle day-to-day operations
+Transfers Master to hardware wallet (offline)
+↓
+Master key now in cold storage
+↓
+Guardians use delegated passes for day-to-day operations
+↓
+Guardians CANNOT access master key
 ↓
 Master only needed for critical actions
 ```
+
+**Security Benefit**:
+- Master key offline = Maximum security
+- Guardians use delegated passes = Convenience
+- Compromise of Guardian = Limited damage (no master key)
+- Compromise of Master = Full wallet access (hence cold storage)
 
 ### 2. Team Management
 ```
 Project mints Master NFT
 ↓
+Master holds master encryption key
+↓
 Creates Guardian NFTs for team members
 ↓
-Each Guardian has specific role:
-  - Guardian #1: Marketing (view balance, social media)
-  - Guardian #2: Developer (deploy contracts)
-  - Guardian #3: Finance (transfer up to 1000 PANGI)
+Each Guardian receives delegated pass (NOT master key)
 ↓
-Master NFT held by founder (offline)
+Each Guardian has specific role:
+  - Guardian #1: Marketing (delegated pass: view balance, social media)
+  - Guardian #2: Developer (delegated pass: deploy contracts)
+  - Guardian #3: Finance (delegated pass: transfer up to 1000 PANGI)
+↓
+Master NFT held by founder (offline, master key secure)
+↓
+If Guardian compromised: Revoke delegated pass, master key safe
 ```
+
+**Security Benefit**:
+- Team members get delegated passes, not master key
+- Compromised team member = Revoke their pass only
+- Master key remains secure with founder
+- No single point of failure among team
 
 ### 3. Trading Without Risk
 ```
@@ -509,16 +714,86 @@ Master controls "savings" subdomain
 ## Security Considerations
 
 ### Risks
-1. **Master NFT loss**: Wallet permanently encrypted
-2. **Master NFT theft**: Attacker gains full control
-3. **Guardian privilege escalation**: Security vulnerability
-4. **Encryption key exposure**: Wallet compromised
+1. **Master NFT loss**: Wallet permanently encrypted (master key lost)
+2. **Master NFT theft**: Attacker gains full control (master key stolen)
+3. **Guardian compromise**: Limited damage (only delegated pass exposed)
+4. **Delegated pass theft**: Attacker gets Guardian permissions only
+5. **Master key exposure**: Wallet fully compromised
 
 ### Mitigations
-1. **Backup system**: Encrypted key backup with recovery phrase
-2. **Time-locks**: Delay on Master reassignment
-3. **Permission auditing**: Log all Guardian actions
-4. **Key rotation**: Periodic encryption key updates
+1. **Backup system**: Encrypted master key backup with recovery phrase
+2. **Cold storage**: Master NFT offline, master key secure
+3. **Delegated passes**: Guardians never get master key
+4. **One-way derivation**: Cannot derive master key from delegated pass
+5. **Pass revocation**: Master can revoke Guardian passes anytime
+6. **Time-locks**: Delay on Master reassignment
+7. **Permission auditing**: Log all Guardian actions
+8. **Scope limitation**: Guardians only access permitted wallets
+9. **Key rotation**: Periodic master key updates (Master only)
+
+### Attack Scenarios & Defense
+
+**Scenario 1: Guardian NFT Stolen**
+```
+Attacker steals Guardian NFT #1
+↓
+Attacker has delegated pass
+↓
+Can perform Guardian #1 permissions only
+↓
+CANNOT access master key
+↓
+CANNOT decrypt full wallet
+↓
+Master revokes Guardian #1 pass
+↓
+Attacker's access terminated
+```
+
+**Scenario 2: Master NFT Stolen**
+```
+Attacker steals Master NFT
+↓
+Attacker has master encryption key
+↓
+Can decrypt entire wallet
+↓
+FULL COMPROMISE
+↓
+Defense: Store Master in cold wallet (offline)
+```
+
+**Scenario 3: Delegated Pass Leaked**
+```
+Guardian #2 delegated pass leaked
+↓
+Attacker can perform Guardian #2 actions
+↓
+CANNOT derive master key (one-way derivation)
+↓
+CANNOT access other Guardians' scopes
+↓
+Master revokes Guardian #2 pass
+↓
+Generates new delegated pass for legitimate Guardian #2
+```
+
+**Scenario 4: Multiple Guardians Compromised**
+```
+Attacker compromises Guardian #1, #2, #3
+↓
+Has 3 delegated passes
+↓
+Can perform all 3 Guardians' permissions
+↓
+STILL CANNOT derive master key
+↓
+STILL CANNOT access Master-only wallets (Documents, Medical, ID)
+↓
+Master revokes all compromised passes
+↓
+Master key remains secure
+```
 
 ## Conclusion
 
