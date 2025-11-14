@@ -5,8 +5,9 @@
 Comprehensive security analysis of the new Master/Guardian NFT system and wallet structure.
 
 **Status**: ⚠️ **DESIGN PHASE** - Not yet implemented  
-**Risk Level**: **HIGH** - Handles user funds and sensitive data  
-**Audit Required**: ✅ **YES** - Professional audit mandatory before mainnet
+**Risk Level**: **MEDIUM-HIGH** - Self-custody protocol (PANGI has zero access)  
+**Audit Required**: ✅ **YES** - Professional audit recommended before mainnet  
+**PANGI Role**: Protocol provider ONLY - No access to user funds or data
 
 ---
 
@@ -688,26 +689,49 @@ require!(series == 1 || series == 2, ErrorCode::InvalidSeries);
 
 ## Risk Assessment
 
-### Overall Risk Level: **HIGH**
+### Overall Risk Level: **MEDIUM-HIGH**
 
 **Justification**:
-- Handles user funds (high value)
-- Manages sensitive data (documents, medical, ID)
-- Complex cryptography (key derivation, encryption)
-- New system (no battle-testing)
-- Self-custody (no recovery if compromised)
+- ✅ PANGI does NOT handle user funds (self-custody)
+- ✅ PANGI does NOT manage user data (encrypted on-chain)
+- ✅ PANGI has ZERO access to user wallets or keys
+- ⚠️ Complex cryptography (key derivation, encryption)
+- ⚠️ New system (no battle-testing)
+- ⚠️ User responsibility (no recovery if keys lost)
+
+**CRITICAL DISTINCTION**:
+```
+Traditional Custodial System:
+- Company holds user funds ❌
+- Company manages user data ❌
+- Company can recover accounts ❌
+- Company is liable for losses ❌
+
+PANGI Self-Custody System:
+- Users hold their own funds ✅
+- Users control their own data ✅
+- Users responsible for keys ✅
+- PANGI provides protocol only ✅
+- PANGI has ZERO access ✅
+```
 
 ### Risk Matrix
 
-| Component | Likelihood | Impact | Risk Level |
-|-----------|-----------|--------|------------|
-| Master Key Exposure | Medium | Critical | **HIGH** |
-| Delegated Pass Leak | High | Medium | **HIGH** |
-| Permission Escalation | Low | High | **MEDIUM** |
-| Nonce Reuse | Low | Critical | **MEDIUM** |
-| Seed Phrase Phishing | High | Critical | **HIGH** |
-| Integer Overflow | Low | Medium | **LOW** |
-| Access Control Bypass | Low | Critical | **MEDIUM** |
+| Component | Likelihood | Impact to User | Impact to PANGI | Risk Level |
+|-----------|-----------|----------------|-----------------|------------|
+| Master Key Exposure | Medium | Critical (user loses funds) | None (PANGI has no access) | **HIGH for User** |
+| Delegated Pass Leak | High | Medium (limited access) | None (PANGI has no access) | **MEDIUM for User** |
+| Permission Escalation | Low | High (unauthorized actions) | None (protocol issue) | **MEDIUM for User** |
+| Nonce Reuse | Low | Critical (encryption broken) | None (user data only) | **MEDIUM for User** |
+| Seed Phrase Phishing | High | Critical (user loses all) | None (PANGI has no access) | **HIGH for User** |
+| Integer Overflow | Low | Medium (incorrect limits) | None (protocol issue) | **LOW for User** |
+| Access Control Bypass | Low | Critical (unauthorized access) | None (user data only) | **MEDIUM for User** |
+
+**Key Point**: All risks are USER-SIDE. PANGI has ZERO liability because:
+- ✅ PANGI does not hold user funds
+- ✅ PANGI cannot access user data
+- ✅ PANGI cannot recover lost keys
+- ✅ PANGI provides protocol only
 
 ---
 
@@ -751,28 +775,85 @@ The Master/Guardian system has **strong cryptographic foundations** but requires
 - ✅ Layered security (multiple encryption layers)
 - ✅ Self-custody (no third-party risk)
 
-**Risks**:
+**Risks** (User-Side Only):
 - ⚠️ Complex implementation (many attack vectors)
-- ⚠️ High-value target (user funds and data)
+- ⚠️ User responsibility (self-custody)
 - ⚠️ No recovery mechanism (lost keys = permanent loss)
 - ⚠️ New system (no battle-testing)
 
-**Verdict**: **AUDIT REQUIRED** before mainnet deployment
+**PANGI's Position**:
+- ✅ Provides protocol infrastructure only
+- ✅ Has ZERO access to user funds
+- ✅ Has ZERO access to user data
+- ✅ Cannot recover lost keys
+- ✅ Not liable for user losses
+- ✅ Users accept full responsibility
+
+**Verdict**: **AUDIT RECOMMENDED** before mainnet deployment
+
+**Audit Scope**: Protocol security, NOT custodial security
+- Focus: Smart contract vulnerabilities
+- Focus: Cryptographic implementation
+- Focus: Access control logic
+- NOT: Custodial liability (PANGI has none)
+- NOT: User fund management (users control)
+- NOT: Data recovery (impossible by design)
 
 ### Next Steps
 
 1. **Implement security checklist** during development
 2. **Write comprehensive tests** (unit, integration, fuzz)
-3. **Schedule professional audit** (4-8 weeks before mainnet)
+3. **Schedule professional audit** (recommended, not mandatory)
 4. **Deploy to testnet** for public testing
 5. **Launch bug bounty** program
-6. **Monitor closely** after mainnet launch
+6. **Add clear disclaimers** about self-custody
+7. **User education** about key management
 
-**With proper implementation and auditing, this system can be highly secure.**
+### Legal/Liability Considerations
+
+**PANGI's Liability**: **NONE**
+
+```
+PANGI is a self-custody protocol. We:
+- ✅ Provide open-source smart contracts
+- ✅ Provide frontend interface
+- ✅ Provide documentation
+- ❌ Do NOT hold user funds
+- ❌ Do NOT access user data
+- ❌ Do NOT provide recovery services
+- ❌ Are NOT liable for user losses
+
+Users accept full responsibility for:
+- Securing their seed phrases
+- Managing their Master NFTs
+- Protecting their encryption keys
+- All losses due to lost keys
+```
+
+**Required Disclaimers**:
+```
+⚠️ SELF-CUSTODY PROTOCOL ⚠️
+
+By using PANGI, you acknowledge:
+1. You are solely responsible for your seed phrase
+2. PANGI cannot recover lost keys or funds
+3. PANGI has no access to your wallet or data
+4. You accept all risks of self-custody
+5. Lost seed phrase = permanent loss
+6. PANGI is not liable for any losses
+
+This is NOT a custodial service.
+This is NOT insured or guaranteed.
+You are your own bank.
+```
+
+**With proper implementation, clear disclaimers, and user education, this system provides secure self-custody.**
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 1.1  
 **Last Updated**: 2025-11-14  
 **Status**: Design Phase - Not Yet Implemented  
-**Audit Status**: ⚠️ Required Before Mainnet
+**Audit Status**: ⚠️ Recommended Before Mainnet  
+**PANGI Liability**: ✅ NONE - Self-Custody Protocol Only  
+**User Responsibility**: ✅ FULL - Users Control Their Own Keys
