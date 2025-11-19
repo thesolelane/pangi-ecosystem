@@ -10,7 +10,7 @@ A revolutionary NFT-based wallet custody and permission system where NFTs act as
 **Definition**: An NFT that acts as the primary key to an encrypted wallet and controls all permissions.
 
 **Key Properties**:
-- Can be any NFT (Hatchling or Adult)
+- Can be any NFT (Pangopup or Adult)
 - First minted NFT with assigned wallet becomes Master
 - Acts as cryptographic key to decrypt wallet data
 - Holds all permissions and control
@@ -26,6 +26,9 @@ A revolutionary NFT-based wallet custody and permission system where NFTs act as
 - Limited, specific permissions only
 - Cannot become Master (unless assigned)
 - Encourages additional minting
+- **Reports OUT only** (no inbound data from PANGI)
+- Master installs reporting configuration
+- Sends reports to public addresses configured by Master
 
 ### Encrypted Shadow Wallets
 **Definition**: Encrypted wallet data that requires Master NFT + TOC (Terms of Control) to decrypt.
@@ -45,7 +48,7 @@ A revolutionary NFT-based wallet custody and permission system where NFTs act as
 │                                                               │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │              Master NFT (Key)                        │   │
-│  │  • Hatchling #42 or Adult #1542                      │   │
+│  │  • Pangopup #42 or Adult #1542                      │   │
 │  │  • Holds encryption key                              │   │
 │  │  • Full wallet control                               │   │
 │  │  • Can create Guardians                              │   │
@@ -85,7 +88,7 @@ A revolutionary NFT-based wallet custody and permission system where NFTs act as
 
 **User mints first NFT**:
 ```
-User → Mint Hatchling #42
+User → Mint Pangopup #42
 ↓
 System generates:
   1. 24-word seed phrase (BIP39)
@@ -95,10 +98,10 @@ System generates:
 ↓
 System creates encrypted shadow wallet
 ↓
-Hatchling #42 = Master NFT (holds encryption key)
+Pangopup #42 = Master NFT (holds encryption key)
 ↓
 User receives:
-  • Master NFT (Hatchling #42)
+  • Master NFT (Pangopup #42)
   • 24-word seed phrase (MUST BACKUP)
   • Private key (derived from seed)
   • Public key / Wallet address (derived from private)
@@ -122,7 +125,7 @@ User receives:
 
 **What User Receives (Example)**:
 ```
-Master NFT: Hatchling #42
+Master NFT: Pangopup #42
 Mint Address: 7xK9...3mP2 (public, can share)
 
 Seed Phrase (24 words - NEVER SHARE):
@@ -144,7 +147,7 @@ a7f3c9e2d8b4f1a6c5e9d3b7f2a8c4e1d9b6f3a7...
 ```
 
 **What happens**:
-- Random NFT minted (Hatchling or Adult)
+- Random NFT minted (Pangopup or Adult)
 - 24-word seed phrase generated (BIP39 standard)
 - Private key derived from seed phrase
 - Public key (wallet address) derived from private key
@@ -193,13 +196,13 @@ User can view/control wallet
 ```
 User (holds Master #42) → Mint new NFT
 ↓
-New NFT minted (e.g., Hatchling #156)
+New NFT minted (e.g., Pangopup #156)
 ↓
 Master generates delegated pass (NOT master key)
 ↓
 Master assigns limited permissions + delegated pass
 ↓
-Hatchling #156 = Guardian NFT
+Pangopup #156 = Guardian NFT
 ↓
 Guardian can perform assigned tasks only
 ```
@@ -238,6 +241,16 @@ Guardian CANNOT derive Master Key from delegated pass
 - Manage specific subdomains (scoped access)
 - Execute specific transactions (pre-approved types)
 - Access certain data (limited scope)
+- **Report OUT to public addresses** (configured by Master)
+- Monitor staking positions and report unlock events
+
+**Guardian Reporting** (Self-Custody Mandatory Reporting):
+- ✅ Guardian reports OUT only (one-way communication)
+- ✅ Master installs reporting configuration
+- ✅ Reports sent to public addresses (e.g., reward distribution address)
+- ❌ Guardian receives NO data from PANGI
+- ❌ No inbound communication to Guardian
+- ✅ Example: Guardian monitors staking unlock and reports to public reward address
 
 **Guardian Limitations**:
 - ❌ Cannot decrypt full wallet (no master key)
@@ -245,6 +258,7 @@ Guardian CANNOT derive Master Key from delegated pass
 - ❌ Cannot derive master key from delegated pass
 - ❌ Cannot create other Guardians
 - ❌ Cannot change Master
+- ❌ Cannot receive data from PANGI (reports OUT only)
 - ❌ Cannot access Master-level functions
 - ❌ Cannot access wallets outside permission scope
 - ❌ Cannot modify own permissions (requires Master NFT connection)
@@ -278,15 +292,15 @@ Guardian receives updated permissions
 
 **Transfer Master status**:
 ```
-Current Master: Hatchling #42
+Current Master: Pangopup #42
 User mints: Adult #1789
 ↓
 User (with Master #42) assigns Adult #1789 as new Master
 ↓
 Adult #1789 = New Master (receives encryption key)
-Hatchling #42 = Becomes Guardian or regular NFT
+Pangopup #42 = Becomes Guardian or regular NFT
 ↓
-User can now trade Hatchling #42 without losing wallet control
+User can now trade Pangopup #42 without losing wallet control
 ```
 
 **Why assign new Master**:
@@ -334,15 +348,15 @@ Step 5: Wallet control retained with new Master
 **Example**:
 ```
 User mints 10 NFTs:
-- Hatchling #42 (Master) - Uncommon Azure
-- Hatchling #156 (Guardian) - Common Pure
-- Hatchling #287 (Guardian) - Rare Crystal
+- Pangopup #42 (Master) - Uncommon Azure
+- Pangopup #156 (Guardian) - Common Pure
+- Pangopup #287 (Guardian) - Rare Crystal
 - Adult #1542 (Matching pair to #42!) - Uncommon Azure
-- Hatchling #391 (Regular) - Common Pure
+- Pangopup #391 (Regular) - Common Pure
 - Adult #1678 (Regular) - Rare Shadow
-- Hatchling #445 (Regular) - Legendary Cyber (Jackpot!)
+- Pangopup #445 (Regular) - Legendary Cyber (Jackpot!)
 - Adult #1889 (Regular) - Common Pure
-- Hatchling #523 (Regular) - Uncommon Verdant
+- Pangopup #523 (Regular) - Uncommon Verdant
 - Adult #2001 (Regular) - Rare Titan
 
 Result:
@@ -384,11 +398,17 @@ pub struct GuardianNFT {
     pub expires_at: Option<i64>,             // Optional expiration
     pub last_modified: Option<i64>,          // Last permission update (requires Master)
     pub modification_count: u8,              // Number of times permissions changed
+    pub reporting_config: ReportingConfig,   // Reporting configuration (Master-installed)
 }
 
 // IMPORTANT: Guardian permissions are SET AT CREATION
 // To change permissions, Master NFT must be connected to wallet
 // Master NFT address ≠ Wallet address (privacy preserved)
+//
+// REPORTING MODEL: Self-Custody Mandatory Reporting
+// - Guardian reports OUT only (no inbound data from PANGI)
+// - Master installs reporting configuration
+// - Reports sent to public addresses configured by Master
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum Permission {
@@ -397,6 +417,7 @@ pub enum Permission {
     ManageSubdomains,
     ExecuteTransaction { tx_type: String },
     ReadData { data_type: String },
+    ReportEvents { event_types: Vec<String> },  // Report OUT to public address
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -406,6 +427,22 @@ pub struct PermissionScope {
     pub can_manage_subdomains: Vec<String>,  // Specific subdomains only
     pub max_transaction_amount: u64,         // Transaction limit
     pub allowed_operations: Vec<String>,     // Specific operations only
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct ReportingConfig {
+    pub report_destination: Pubkey,          // Public address where Guardian sends reports
+    pub report_frequency: ReportFrequency,   // When to send reports
+    pub report_types: Vec<String>,           // Types of events to report
+    pub no_inbound_data: bool,               // Always true (Guardian reports OUT only)
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum ReportFrequency {
+    OnEvent,                                 // Report immediately when event occurs
+    Hourly,                                  // Report every hour
+    Daily,                                   // Report daily summary
+    OnUnlock,                                // Report when stake unlocks
 }
 ```
 
@@ -637,7 +674,7 @@ fn derive_delegated_pass(
 ```
 Master NFT Mint Address (Public)
 ├── NFT #42 mint: 7xK9...3mP2 (on-chain, visible)
-├── Metadata: Obsidian Claw Hatchling #42
+├── Metadata: Obsidian Claw Pangopup #42
 └── Linked to encrypted wallet system
 
 Wallet Address Holding Master NFT (Private)
@@ -866,7 +903,7 @@ Mints Adult #1542 (matching pair)
 ↓
 Assigns Adult #1542 as new Master
 ↓
-Trades Hatchling #42 for profit
+Trades Pangopup #42 for profit
 ↓
 Retains full wallet control
 ```
@@ -896,7 +933,7 @@ Seamless inheritance
 
 **With Master/Guardian system**:
 ```
-User mints Hatchling #42 (Master)
+User mints Pangopup #42 (Master)
 ↓
 Mints 5 more NFTs (Guardians)
 ↓

@@ -258,7 +258,7 @@ require!(
 
 **1. Evolution Cooldown Not Enforced**
 ```rust
-pub fn evolve_hatchling(...) -> Result<()> {
+pub fn evolve_pangopup(...) -> Result<()> {
     // MISSING: Check last_evolution_timestamp
     // User can evolve immediately!
 }
@@ -270,7 +270,7 @@ pub fn evolve_hatchling(...) -> Result<()> {
 
 **2. No Lock Mechanism During Staking**
 ```rust
-pub struct Hatchling {
+pub struct Pangopup {
     pub is_locked: bool,  // DEFINED but NOT USED
 }
 ```
@@ -284,8 +284,8 @@ pub struct Hatchling {
 // DEFINED but NOT ENFORCED
 const MAX_EVOLUTION_COUNT: u32 = 100;
 
-pub fn evolve_hatchling(...) -> Result<()> {
-    hatchling.evolution_count += 1;  // No check!
+pub fn evolve_pangopup(...) -> Result<()> {
+    pangopup.evolution_count += 1;  // No check!
 }
 ```
 
@@ -441,9 +441,9 @@ export const PANGI_TOKEN_PROGRAM_ID_STR =
 1. **Implement NFT Locking**
 ```rust
 pub fn lock_nft(ctx: Context<LockNFT>) -> Result<()> {
-    let hatchling = &mut ctx.accounts.hatchling;
-    require!(!hatchling.is_locked, ErrorCode::NFTAlreadyLocked);
-    hatchling.is_locked = true;
+    let pangopup = &mut ctx.accounts.pangopup;
+    require!(!pangopup.is_locked, ErrorCode::NFTAlreadyLocked);
+    pangopup.is_locked = true;
     Ok(())
 }
 ```
@@ -452,7 +452,7 @@ pub fn lock_nft(ctx: Context<LockNFT>) -> Result<()> {
 ```rust
 const MINT_COOLDOWN: i64 = 60 * 60; // 1 hour between mints
 
-pub fn initialize_hatchling(...) -> Result<()> {
+pub fn initialize_pangopup(...) -> Result<()> {
     // Check user's last mint time
     require!(
         clock.unix_timestamp - user.last_mint >= MINT_COOLDOWN,

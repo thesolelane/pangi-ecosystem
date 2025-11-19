@@ -4,7 +4,7 @@
 
 **Collection Name**: Obsidian Claw Clan  
 **Total Supply**: 3000 NFTs  
-**Structure**: 1500 Hatchlings + 1500 Adults (matching pairs)
+**Structure**: 1500 Pangopups + 1500 Adults (matching pairs)
 
 ## Tribe System
 
@@ -22,7 +22,7 @@
 
 ## Age Groups
 
-- **Hatchling** (IDs 1-1500) - Baby pangolins with trait hints
+- **Pangopup** (IDs 1-1500) - Baby pangolins with trait hints
 - **Adult** (IDs 1501-3000) - Fully grown with complete trait reveal
 
 ## Trait Categories
@@ -85,7 +85,7 @@
 
 ### Total: 3000 NFTs (1500 pairs)
 
-| Rarity | Hatchlings | Adults | Total | Percentage |
+| Rarity | Pangopups | Adults | Total | Percentage |
 |--------|-----------|--------|-------|------------|
 | Common | 750 | 750 | 1500 | 50% |
 | Uncommon | 525 | 525 | 1050 | 35% |
@@ -111,7 +111,7 @@
 
 ## Matching Pairs System
 
-Each Hatchling has a corresponding Adult with:
+Each Pangopup has a corresponding Adult with:
 - **Same lineage** (Pure or specific Hybrid)
 - **Same rarity tier**
 - **Matching base traits** (scale type, eyes, etc.)
@@ -119,9 +119,9 @@ Each Hatchling has a corresponding Adult with:
 
 ### Example Pair
 ```
-Hatchling #1:
+Pangopup #1:
 - Tribe: Obsidian Claw (Verdant Hybrid)
-- Age: Hatchling
+- Age: Pangopup
 - Scale: Neon Circuit
 - Eyes: Runic Red
 - Tail: Coral Fan
@@ -178,7 +178,7 @@ Legendary NFTs typically feature:
 
 ## Collection Strategy
 
-### Phase 1: Hatchling Mint (1500 NFTs)
+### Phase 1: Pangopup Mint (1500 NFTs)
 - Mint IDs 1-1500
 - Trait hints in artwork
 - Full metadata stored
@@ -188,14 +188,14 @@ Legendary NFTs typically feature:
 - Mint IDs 1501-3000
 - Full trait reveal in artwork
 - Enhanced visual details
-- Matching hatchling ID referenced
+- Matching pangopup ID referenced
 
 ### Pairing System
 ```
-Hatchling #1 ↔ Adult #1501
-Hatchling #2 ↔ Adult #1502
+Pangopup #1 ↔ Adult #1501
+Pangopup #2 ↔ Adult #1502
 ...
-Hatchling #1500 ↔ Adult #3000
+Pangopup #1500 ↔ Adult #3000
 ```
 
 ## Lore: The Obsidian Claw Clan
@@ -210,7 +210,7 @@ The Obsidian Claw Clan represents the ancient pangolin warriors who protected th
 - **Titan**: Gained immense strength
 - **Verdant**: United with nature
 
-Each hatchling carries the potential of their lineage, growing into powerful adults who continue the clan's legacy.
+Each pangopup carries the potential of their lineage, growing into powerful adults who continue the clan's legacy.
 
 ## Technical Implementation
 
@@ -221,7 +221,7 @@ Each hatchling carries the potential of their lineage, growing into powerful adu
   "collection": "Obsidian Claw Clan",
   "attributes": [
     {"trait_type": "Tribe", "value": "Obsidian Claw (Verdant Hybrid)"},
-    {"trait_type": "Age Group", "value": "Hatchling"},
+    {"trait_type": "Age Group", "value": "Pangopup"},
     {"trait_type": "Scale Type", "value": "Neon Circuit"},
     {"trait_type": "Eyes", "value": "Runic Red"},
     {"trait_type": "Tail Type", "value": "Coral Fan"},
@@ -243,11 +243,11 @@ Each hatchling carries the potential of their lineage, growing into powerful adu
 
 ## Marketing Angles
 
-1. **Collect the Pair** - Own both hatchling and adult
+1. **Collect the Pair** - Own both pangopup and adult
 2. **Lineage Pride** - Collect all from one hybrid line
 3. **Rarity Hunt** - Chase legendary combinations
 4. **Lore Building** - Each lineage has unique story
-5. **Visual Evolution** - See your hatchling's adult form
+5. **Visual Evolution** - See your pangopup's adult form
 
 ## File Location
 

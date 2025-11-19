@@ -5,7 +5,7 @@
 PANGI is a self-custody NFT ecosystem on Solana featuring:
 - **Master/Guardian NFT System**: NFTs as cryptographic keys for encrypted wallets
 - **Structured Wallet System**: 5 required + 2 custom + 2 reserved subdomains (max 9)
-- **Obsidian Claw Collection**: 3000 NFTs (1500 hatchling/adult pairs)
+- **Obsidian Claw Collection**: 3000 NFTs (1500 pangopup/adult pairs)
 - **True Self-Custody**: 24-word seed phrase, no recovery services
 
 ---
@@ -146,9 +146,9 @@ Beyond v2.0: Requires new contract upgrade
 ### Collection Structure
 
 **Series 1: Main Collection (3000 NFTs)**
-- Part 1: 1500 Hatchlings (trait hints in artwork)
+- Part 1: 1500 Pangopups (trait hints in artwork)
 - Part 2: 1500 Adults (full trait reveal)
-- Matching pairs: Hatchling #1 ↔ Adult #1501
+- Matching pairs: Pangopup #1 ↔ Adult #1501
 - No evolution (separate mints)
 
 **Series 2: Special Editions (Flexible)**
@@ -189,7 +189,7 @@ Beyond v2.0: Requires new contract upgrade
 
 **Step 1: Mint First NFT (Master Creation)**
 ```
-User mints Hatchling #42
+User mints Pangopup #42
   ↓
 System generates:
   - 24-word seed phrase
@@ -197,7 +197,7 @@ System generates:
   - Master encryption key
   - Encrypted shadow wallet
   ↓
-Hatchling #42 = Master NFT
+Pangopup #42 = Master NFT
   ↓
 User receives seed phrase (MUST BACKUP)
   ↓
@@ -212,11 +212,11 @@ User receives seed phrase (MUST BACKUP)
 User mints 5 more NFTs
   ↓
 Assigns as Guardians:
-  - Guardian #1 (Hatchling #156): View Funds
+  - Guardian #1 (Pangopup #156): View Funds
   - Guardian #2 (Adult #1678): Transfer up to 1000 PANGI
-  - Guardian #3 (Hatchling #287): Manage Collections
+  - Guardian #3 (Pangopup #287): Manage Collections
   - Guardian #4 (Adult #1889): Business subdomain
-  - Guardian #5 (Hatchling #391): Gaming subdomain
+  - Guardian #5 (Pangopup #391): Gaming subdomain
   ↓
 Each Guardian receives delegated pass (NOT master key)
 ```
@@ -240,7 +240,7 @@ Only connects Master for critical actions:
 
 **Step 4: Matching Pair Strategy**
 ```
-User continues minting to find Adult #1542 (matches Hatchling #42)
+User continues minting to find Adult #1542 (matches Pangopup #42)
   ↓
 Mints 15 more NFTs
   ↓
@@ -248,7 +248,7 @@ Finally gets Adult #1542 (MATCH!)
   ↓
 Option: Assign Adult #1542 as new Master
   ↓
-Hatchling #42 becomes regular NFT (can trade)
+Pangopup #42 becomes regular NFT (can trade)
   ↓
 Wallet control retained with Adult #1542
 ```
@@ -256,7 +256,7 @@ Wallet control retained with Adult #1542
 ### Use Case Examples
 
 **Individual User**:
-- Master: Hatchling #42 (cold wallet)
+- Master: Pangopup #42 (cold wallet)
 - Guardians: 3 NFTs for daily tasks
 - Wallets: All 7 active (5 required + 2 custom)
 - Custom: Gaming + Investments
@@ -488,7 +488,7 @@ PANGI CANNOT HELP
 
 - **NFT_COLLECTION_STRUCTURE.md** (215 lines)
   - Series 1 & 2 structure
-  - Hatchling/Adult pairs
+  - Pangopup/Adult pairs
   - Special editions
 
 - **NFT_IMPLEMENTATION_GUIDE.md** (288 lines)

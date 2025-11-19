@@ -68,7 +68,7 @@ npm run test:distribution
 
 ### 🦎 NFT Program
 **Features Tested:**
-- Hatchling initialization
+- Pangopup initialization
 - Evolution mechanics
 - Cooldown periods (24 hours)
 - Evolution stages (10 levels)

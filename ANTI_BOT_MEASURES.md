@@ -157,7 +157,7 @@ pub struct WhitelistEntry {
     pub minted: u8,
 }
 
-pub fn initialize_hatchling(...) -> Result<()> {
+pub fn initialize_pangopup(...) -> Result<()> {
     let config = &ctx.accounts.global_config;
     
     // If whitelist active, check whitelist
@@ -196,7 +196,7 @@ pub struct MintConfig {
     pub price_decay_rate: u64,
 }
 
-pub fn initialize_hatchling(...) -> Result<()> {
+pub fn initialize_pangopup(...) -> Result<()> {
     let mint_config = &mut ctx.accounts.mint_config;
     let clock = Clock::get()?;
     
@@ -223,8 +223,8 @@ pub fn initialize_hatchling(...) -> Result<()> {
 **Require computation before action:**
 
 ```rust
-pub fn initialize_hatchling(
-    ctx: Context<InitializeHatchling>,
+pub fn initialize_pangopup(
+    ctx: Context<InitializePangopup>,
     evolution_cooldown: i64,
     nonce: u64,  // ✅ ADD: Proof of work nonce
 ) -> Result<()> {
@@ -265,7 +265,7 @@ pub struct GlobalConfig {
     pub phase_end_time: i64,
 }
 
-pub fn initialize_hatchling(...) -> Result<()> {
+pub fn initialize_pangopup(...) -> Result<()> {
     let config = &ctx.accounts.global_config;
     let clock = Clock::get()?;
     
@@ -309,7 +309,7 @@ pub fn initialize_hatchling(...) -> Result<()> {
 **Add unpredictability:**
 
 ```rust
-pub fn initialize_hatchling(...) -> Result<()> {
+pub fn initialize_pangopup(...) -> Result<()> {
     let clock = Clock::get()?;
     
     // Use block timestamp for pseudo-randomness
@@ -342,7 +342,7 @@ pub struct UserReputation {
     pub spam_reports: u32,
 }
 
-pub fn initialize_hatchling(...) -> Result<()> {
+pub fn initialize_pangopup(...) -> Result<()> {
     let reputation = &mut ctx.accounts.user_reputation;
     
     // Require minimum reputation

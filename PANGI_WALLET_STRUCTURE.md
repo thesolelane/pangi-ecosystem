@@ -115,7 +115,18 @@ PANGI.sol governs a structured wallet system with a maximum of **5 base wallets 
 - ✅ Token swaps
 - ✅ NFT trading
 - ✅ DeFi interactions
-- ✅ Guardian access (with limits)
+- ✅ Guardian access (with limits configured by Master)
+
+**Guardian Configuration** (Master-Installed):
+```
+guardian_config/
+├── transfer_limits: 1000 PANGI per transaction
+├── daily_limit: 5000 PANGI
+├── allowed_operations: ["transfer", "swap", "nft_trade"]
+├── reporting_destination: "public_address_xyz"
+├── report_on: ["large_transfer", "daily_summary"]
+└── no_inbound_data: true  # Guardian reports OUT only
+```
 
 **Security Level**: Medium (active use)
 
@@ -128,7 +139,10 @@ funds/
 ├── active_nfts/
 │   ├── trading_nft_1.json
 │   └── trading_nft_2.json
-└── transaction_history/
+├── transaction_history/
+└── guardian_reports/  # Reports sent OUT by Guardian
+    ├── report_2024_01_15.json
+    └── report_2024_01_16.json
 ```
 
 ### 2. Documents Wallet (Required)
@@ -197,7 +211,7 @@ documents/
 ```
 collections/
 ├── art/
-│   ├── obsidian_claw_hatchling_42.json
+│   ├── obsidian_claw_pangopup_42.json
 │   ├── obsidian_claw_adult_1542.json
 │   ├── legendary_cyber_445.json
 │   └── rare_crystal_287.json
@@ -333,6 +347,20 @@ investments/
 └── yield_farming/
 ```
 
+**Staking Subdomain** (Self-Custody Mandatory Reporting):
+```
+staking/
+├── staked_pangi_tokens/
+├── lock_duration_config/
+├── guardian_reporting_config/    # Master installs this
+│   ├── report_destination: "public_reward_address"
+│   ├── reporting_frequency: "on_unlock"
+│   ├── report_format: "unlock_event"
+│   └── no_inbound_data: true     # Guardian reports OUT only
+├── stake_positions/
+└── reward_history/
+```
+
 **Family Subdomain**:
 ```
 family/
@@ -370,6 +398,8 @@ education/
 - ❌ User Master NFTs
 - ❌ User documents or funds
 - ❌ Wallet recovery
+- ❌ Guardian reporting data (Guardian reports OUT only)
+- ❌ Inbound data to Guardians (no data sent from PANGI to Guardians)
 
 ### Self-Custody Model
 
@@ -411,23 +441,31 @@ User loses access permanently
    ↓
 2. Create Guardian NFTs for daily operations
    ↓
-3. Assign Guardian permissions
+3. Master installs Guardian reporting configuration
    ↓
-4. Transfer Master NFT to cold wallet (hardware wallet)
+4. Assign Guardian permissions and reporting rules
    ↓
-5. Store cold wallet securely offline
+5. Configure public address for Guardian reports
    ↓
-6. Use Guardians for day-to-day activities
+6. Transfer Master NFT to cold wallet (hardware wallet)
    ↓
-7. Only access Master NFT for critical changes
+7. Store cold wallet securely offline
+   ↓
+8. Use Guardians for day-to-day activities
+   ↓
+9. Guardians report OUT to configured public address
+   ↓
+10. Only access Master NFT for critical changes
 ```
 
 **Benefits**:
 - ✅ Master NFT safe offline
 - ✅ Guardians handle daily tasks
+- ✅ Guardians report OUT only (no inbound data)
 - ✅ Reduced exposure to theft/loss
 - ✅ User maintains full control
 - ✅ No third-party custody
+- ✅ Self-custody mandatory reporting
 
 **Example**:
 ```
@@ -435,12 +473,21 @@ User stores Master NFT #42 in Ledger hardware wallet
 ↓
 Ledger stored in safe deposit box
 ↓
+Master configured Guardian reporting:
+  - Report destination: public_reward_address_xyz
+  - Report frequency: on_unlock, daily_summary
+  - No inbound data: true
+↓
 Guardian #1 (hot wallet): View balances, transfer up to 1000 PANGI
+  └── Reports OUT to public_reward_address_xyz
 Guardian #2 (hot wallet): Manage Collections display
-Guardian #3 (hot wallet): Execute routine transactions
+  └── Reports OUT collection changes
+Guardian #3 (hot wallet): Monitor staking, report unlocks
+  └── Reports OUT unlock events to reward address
 ↓
 Master NFT only needed for:
   - Creating new Guardians
+  - Updating Guardian reporting configuration
   - Assigning new Master
   - Accessing Documents/Medical/ID wallets
   - Major fund movements
@@ -785,7 +832,7 @@ pub fn get_max_storage(wallet_system: &PangiWalletSystem) -> u64 {
 ### Example 1: Individual User
 
 ```
-Master NFT: Hatchling #42
+Master NFT: Pangopup #42
 
 Wallets:
 1. Funds: 10 SOL, 50K PANGI, trading NFTs

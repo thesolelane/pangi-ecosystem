@@ -1,11 +1,26 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import TokenBalance from "@/components/TokenBalance";
 import ProgramInfo from "@/components/ProgramInfo";
 import WalletInfo from "@/components/WalletInfo";
 import Image from "next/image";
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <div style={{ color: "#9AA3AE", fontSize: "18px" }}>Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "grid", gap: "80px", paddingTop: "40px", paddingBottom: "80px" }}>
       {/* Hero Section */}
@@ -43,10 +58,10 @@ export default function Home() {
                 backgroundClip: "text",
               }}
             >
-              Evolving NFTs with on-chain utility
+              Matching Pair NFTs with on-chain utility
             </h1>
             <p style={{ color: "#9AA3AE", fontSize: "18px", margin: 0, maxWidth: "600px", marginLeft: "auto", marginRight: "auto" }}>
-              Stake, evolve, and share in ecosystem distributions. A DeFi-native evolution game built for Solana.
+              Collect pangopups, grow them into adults through staking or community milestones. A DeFi-native collection with real utility built for Solana.
             </p>
           </div>
 
@@ -89,9 +104,9 @@ export default function Home() {
                   className="rounded-2xl"
                 />
                 <div>
-                  <p style={{ color: "#9AA3AE", fontSize: "14px", margin: 0 }}>Evolution Tier</p>
-                  <p style={{ fontSize: "28px", fontWeight: 700, margin: "4px 0", color: "#E6E8EB" }}>Egg</p>
-                  <p style={{ color: "#9945FF", fontSize: "13px", margin: 0, fontWeight: 600 }}>Stake to advance →</p>
+                  <p style={{ color: "#9AA3AE", fontSize: "14px", margin: 0 }}>Life Stage</p>
+                  <p style={{ fontSize: "28px", fontWeight: 700, margin: "4px 0", color: "#E6E8EB" }}>Pangopup</p>
+                  <p style={{ color: "#9945FF", fontSize: "13px", margin: 0, fontWeight: 600 }}>Soft scales, riding mother's tail</p>
                 </div>
               </div>
             </div>
@@ -118,9 +133,9 @@ export default function Home() {
         <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
           {[
             { icon: "💎", title: "Dynamic Tax System", body: "Route a % of transfers to the Conservation Fund." },
-            { icon: "🖼️", title: "Evolving NFTs", body: "Advance from Egg to Legendary by staking." },
-            { icon: "🔒", title: "Staking Vaults", body: "Lock NFTs to earn rewards and evolution points." },
-            { icon: "💰", title: "Special 25", body: "63M $PANGI linked to 25 legendary NFTs." },
+            { icon: "🖼️", title: "Matching Pair NFTs", body: "1,500 pairs: Pangopups available now, Adults unlock at 50% mint or $100 stake." },
+            { icon: "🔒", title: "Grow Your Pup", body: "Stake $100 USD worth of PANGI → Adult airdropped instantly!" },
+            { icon: "💰", title: "Special Titles", body: "1-of-1 NFTs: King, Queen, Chancellor, General - Ultra-rare editions." },
           ].map((feature) => (
             <div
               key={feature.title}

@@ -559,7 +559,7 @@ macro_rules! safe_sub {
 ```rust
 // Existing pattern
 require!(
-    ctx.accounts.authority.key() == hatchling.authority,
+    ctx.accounts.authority.key() == pangopup.authority,
     ErrorCode::Unauthorized
 );
 ```

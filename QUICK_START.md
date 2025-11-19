@@ -119,7 +119,7 @@ pangi-ecosystem/
 - 10 evolution stages
 - 24-hour cooldown
 - Increasing rewards
-- Hatchling → Transcendent
+- Pangopup → Transcendent
 
 ### Vault Program
 - NFT-linked storage

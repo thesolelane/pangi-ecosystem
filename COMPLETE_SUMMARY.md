@@ -24,7 +24,7 @@ PANGI Ecosystem is a production-ready Solana token ecosystem featuring:
 | Program | Purpose | Tests | Status |
 |---------|---------|-------|--------|
 | **Token Program** | PANGI token with dynamic tax rates | 41 | ✅ Ready |
-| **NFT Program** | Hatchling NFTs with evolution | 30 | ✅ Ready |
+| **NFT Program** | Pangopup NFTs with evolution | 30 | ✅ Ready |
 | **Vault Program** | NFT-linked token storage | 10 | ✅ Ready |
 | **Distribution Program** | Special token distribution | 11 | ✅ Ready |
 

@@ -5,21 +5,21 @@
 The PANGI NFT collection consists of two distinct series with different mechanics:
 
 ### Series 1: Main Collection (3000 NFTs)
-- **1500 Hatchlings** (Part 1) - Baby pangolins with trait hints
+- **1500 Pangopups** (Part 1) - Baby pangolins with trait hints
 - **1500 Adults** (Part 2) - Matching adults with full trait reveal
-- **No evolution** - Hatchlings and Adults are separate mints
-- **Matching pairs** - Each hatchling has a corresponding adult
+- **No evolution** - Pangopups and Adults are separate mints
+- **Matching pairs** - Each pangopup has a corresponding adult
 
 ### Series 2: Special Editions (Flexible Supply)
 - Promotional and marketing NFTs
-- Can include all 5 stages (Egg, Hatchling, Juvenile, Adult, Legendary)
+- Can include all 5 stages (Egg, Pangopup, Juvenile, Adult, Legendary)
 - **Evolution enabled** for special editions
 - No matching requirements
 - Includes 1-of-1s and orphan NFTs
 
 ## Smart Contract Changes
 
-### New Fields in `Hatchling` Account
+### New Fields in `Pangopup` Account
 ```rust
 pub series: u8,              // 1 = Main, 2 = Special
 pub matching_nft_id: u16,    // Matching pair ID
@@ -28,7 +28,7 @@ pub is_special_edition: bool, // Evolution enabled if true
 
 ### Initialization Parameters
 ```rust
-initialize_hatchling(
+initialize_pangopup(
     evolution_cooldown: i64,
     series: u8,              // NEW: 1 or 2
     matching_nft_id: u16,    // NEW: Pair ID
@@ -42,11 +42,11 @@ initialize_hatchling(
 
 ## Minting Strategy
 
-### Phase 1: Hatchlings (IDs 1-1500)
+### Phase 1: Pangopups (IDs 1-1500)
 ```typescript
-// Mint Hatchling #1
+// Mint Pangopup #1
 await program.methods
-  .initializeHatchling(
+  .initializePangopup(
     new BN(86400), // 24h cooldown (not used for main collection)
     1,             // series = 1 (Main Collection)
     1501,          // matching_nft_id = Adult #1501
@@ -58,12 +58,12 @@ await program.methods
 
 ### Phase 2: Adults (IDs 1501-3000)
 ```typescript
-// Mint Adult #1501 (matches Hatchling #1)
+// Mint Adult #1501 (matches Pangopup #1)
 await program.methods
-  .initializeHatchling(
+  .initializePangopup(
     new BN(86400),
     1,             // series = 1 (Main Collection)
-    1,             // matching_nft_id = Hatchling #1
+    1,             // matching_nft_id = Pangopup #1
     false          // is_special_edition = false
   )
   .accounts({...})
@@ -74,7 +74,7 @@ await program.methods
 ```typescript
 // Mint Special Edition with evolution enabled
 await program.methods
-  .initializeHatchling(
+  .initializePangopup(
     new BN(3600),  // 1h cooldown for evolution
     2,             // series = 2 (Special Edition)
     0,             // matching_nft_id = 0 (no match)
@@ -86,14 +86,14 @@ await program.methods
 
 ## Metadata Structure
 
-### Hatchling Metadata (Series 1)
+### Pangopup Metadata (Series 1)
 ```json
 {
-  "name": "PANGI Hatchling #1",
+  "name": "PANGI Pangopup #1",
   "description": "Baby pangolin with hidden traits that hint at its adult form",
-  "image": "ipfs://QmHatchling1",
+  "image": "ipfs://QmPangopup1",
   "attributes": [
-    {"trait_type": "Stage", "value": "Hatchling"},
+    {"trait_type": "Stage", "value": "Pangopup"},
     {"trait_type": "Series", "value": "Main Collection"},
     {"trait_type": "ID", "value": "1"},
     {"trait_type": "Matching Adult", "value": "1501"},
@@ -117,7 +117,7 @@ await program.methods
     {"trait_type": "Stage", "value": "Adult"},
     {"trait_type": "Series", "value": "Main Collection"},
     {"trait_type": "ID", "value": "1501"},
-    {"trait_type": "Matching Hatchling", "value": "1"},
+    {"trait_type": "Matching Pangopup", "value": "1"},
     {"trait_type": "Rarity", "value": "Rare"},
     {"trait_type": "Strength", "value": "20"},
     {"trait_type": "Agility", "value": "18"},
@@ -151,19 +151,19 @@ await program.methods
 
 ## Trait Matching System
 
-### Hatchling Traits (Hints)
+### Pangopup Traits (Hints)
 - **Visual**: Subtle hints in artwork (color palette, scale pattern outline)
 - **Metadata**: Full trait data stored but described as "hints"
 - **Purpose**: Create anticipation for adult reveal
 
 ### Adult Traits (Full Reveal)
 - **Visual**: Complete trait expression in artwork
-- **Metadata**: Same trait values as matching hatchling
+- **Metadata**: Same trait values as matching pangopup
 - **Additional**: Adult-specific traits (armor, accessories, background)
 
 ### Trait Categories
 
-#### Shared Traits (Hatchling + Adult)
+#### Shared Traits (Pangopup + Adult)
 - Rarity tier
 - Base stats (Strength, Agility, Intelligence)
 - Scale pattern
@@ -197,21 +197,21 @@ await program.methods
 
 ### Display Matching Pairs
 ```typescript
-// Fetch hatchling
-const hatchling = await program.account.hatchling.fetch(hatchlingPDA);
+// Fetch pangopup
+const pangopup = await program.account.pangopup.fetch(pangopupPDA);
 
 // Find matching adult
-const matchingAdultId = hatchling.matchingNftId;
+const matchingAdultId = pangopup.matchingNftId;
 const adultPDA = findAdultPDA(matchingAdultId);
-const adult = await program.account.hatchling.fetch(adultPDA);
+const adult = await program.account.pangopup.fetch(adultPDA);
 
 // Display pair
-console.log(`Hatchling #${hatchling.id} ↔ Adult #${adult.id}`);
+console.log(`Pangopup #${pangopup.id} ↔ Adult #${adult.id}`);
 ```
 
 ### Check Evolution Capability
 ```typescript
-const nft = await program.account.hatchling.fetch(nftPDA);
+const nft = await program.account.pangopup.fetch(nftPDA);
 
 if (nft.isSpecialEdition) {
   // Show evolution button
@@ -232,7 +232,7 @@ if (nft.isSpecialEdition) {
 - Demonstrate evolution mechanics
 
 #### 2. Community Giveaways
-- Orphan hatchlings (no matching adult)
+- Orphan pangopups (no matching adult)
 - Unique designs not in main collection
 - Twitter/Discord contests
 
@@ -250,7 +250,7 @@ if (nft.isSpecialEdition) {
 
 ### Series 1 Validation
 ```rust
-// Hatchling mint (ID 1-1500)
+// Pangopup mint (ID 1-1500)
 require!(series == 1, "Must be Series 1");
 require!(!is_special_edition, "Main collection not special");
 require!(matching_nft_id > 1500 && matching_nft_id <= 3000, "Adult ID must be 1501-3000");
@@ -258,7 +258,7 @@ require!(matching_nft_id > 1500 && matching_nft_id <= 3000, "Adult ID must be 15
 // Adult mint (ID 1501-3000)
 require!(series == 1, "Must be Series 1");
 require!(!is_special_edition, "Main collection not special");
-require!(matching_nft_id >= 1 && matching_nft_id <= 1500, "Hatchling ID must be 1-1500");
+require!(matching_nft_id >= 1 && matching_nft_id <= 1500, "Pangopup ID must be 1-1500");
 ```
 
 ### Series 2 Validation
@@ -272,7 +272,7 @@ require!(is_special_edition, "Special editions must have evolution enabled");
 
 1. **Generate Trait Matrix**: Create CSV with 1500 trait combinations
 2. **Commission Artwork**: 
-   - 1500 hatchling images (with hints)
+   - 1500 pangopup images (with hints)
    - 1500 adult images (full reveal)
    - Special edition artwork as needed
 3. **Metadata Generation**: Script to create JSON metadata for all NFTs
@@ -283,6 +283,6 @@ require!(is_special_edition, "Special editions must have evolution enabled");
 ## Questions?
 
 - How to handle trait generation for 1500 pairs?
-- Art style preferences for hatchling "hints"?
+- Art style preferences for pangopup "hints"?
 - Special edition quantities and types?
 - Minting schedule and phases?

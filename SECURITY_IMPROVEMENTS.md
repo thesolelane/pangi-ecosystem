@@ -64,7 +64,7 @@ let tax = (amount as u128)
 tax_config.max_tax_per_transfer = MAX_TRANSFER_AMOUNT / 10;
 
 // NFT program
-hatchling.is_locked = false;
+pangopup.is_locked = false;
 
 // Vault program
 vault.is_active = true;
@@ -153,7 +153,7 @@ require!(
 
 // All PDAs now use correct seeds:
 // - Token: [b"tax_config"]
-// - NFT: [b"hatchling", nft_mint]
+// - NFT: [b"pangopup", nft_mint]
 // - Vault: [b"vault", nft_mint]
 // - Distribution: [b"distribution_config"]
 ```
@@ -180,7 +180,7 @@ require!(
 - EvolutionCooldownActive
 - MaxEvolutionReached
 - CooldownTooShort/TooLong
-- HatchlingLocked
+- PangopupLocked
 - InvalidNFTMint
 
 **Vault Program (16 errors):**
@@ -208,10 +208,10 @@ require!(
 - TaxConfigUpdatedEvent
 
 **NFT Program:**
-- HatchlingInitializedEvent
+- PangopupInitializedEvent
 - EvolutionEvent
-- HatchlingLockedEvent
-- HatchlingUnlockedEvent
+- PangopupLockedEvent
+- PangopupUnlockedEvent
 
 **Vault Program:**
 - VaultCreatedEvent
@@ -258,8 +258,8 @@ require!(
 ```rust
 pub is_locked: bool,  // Prevents evolution while staked
 
-pub fn lock_hatchling() - Lock for staking
-pub fn unlock_hatchling() - Unlock after unstaking
+pub fn lock_pangopup() - Lock for staking
+pub fn unlock_pangopup() - Unlock after unstaking
 ```
 
 **Vault Program:**
@@ -313,11 +313,11 @@ let result = numerator
 ```rust
 // Check cooldown period
 let time_since_last = clock.unix_timestamp
-    .checked_sub(hatchling.last_evolution_timestamp)
+    .checked_sub(pangopup.last_evolution_timestamp)
     .ok_or(ErrorCode::Overflow)?;
 
 require!(
-    time_since_last >= hatchling.evolution_cooldown,
+    time_since_last >= pangopup.evolution_cooldown,
     ErrorCode::EvolutionCooldownActive
 );
 
@@ -392,7 +392,7 @@ pub distribution_token_account: Account<'info, TokenAccount>,
 
 ### NFT Program
 
-1. **5-Stage Evolution** - Egg → Hatchling → Juvenile → Adult → Legendary
+1. **5-Stage Evolution** - Egg → Pangopup → Juvenile → Adult → Legendary
 2. **Rarity System** - Common, Uncommon, Rare, Epic, Legendary
 3. **Trait System** - Strength, Agility, Intelligence, Special Ability
 4. **Lock/Unlock** - Integration with vault staking

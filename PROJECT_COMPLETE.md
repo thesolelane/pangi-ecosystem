@@ -58,7 +58,7 @@ PANGI is a complete Solana ecosystem featuring:
 
 | Level | Name | Points | Reward |
 |-------|------|--------|--------|
-| 1 | Hatchling | 0 | - |
+| 1 | Pangopup | 0 | - |
 | 2 | Young | 100 | 100 PANGI |
 | 3 | Juvenile | 250 | 250 PANGI |
 | 4 | Adult | 500 | 500 PANGI |

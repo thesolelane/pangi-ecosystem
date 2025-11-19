@@ -233,7 +233,7 @@ test('validate tax calculation', () => {
 // 1. Create NFT
 const nftMint = Keypair.generate();
 await nftProgram.methods
-  .initializeHatchling(cooldown)
+  .initializePangopup(cooldown)
   .accounts({ nftMint, authority })
   .rpc();
 
@@ -283,8 +283,8 @@ const canEvolveNow = canEvolve(lastEvolution, cooldown);
 
 if (canEvolveNow) {
   await nftProgram.methods
-    .evolveHatchling()
-    .accounts({ hatchling, nftMint, authority })
+    .evolvePangopup()
+    .accounts({ pangopup, nftMint, authority })
     .rpc();
   
   // Get new stage

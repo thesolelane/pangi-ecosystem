@@ -14,14 +14,14 @@ This document analyzes how the new Master/Guardian system and wallet structure i
 - ✅ NFT minting with global config
 - ✅ Evolution system (Egg → Legendary)
 - ✅ Series 1 & 2 support (added Nov 13)
-- ✅ Matching pair system (hatchling ↔ adult)
+- ✅ Matching pair system (pangopup ↔ adult)
 - ✅ Special edition support
 - ✅ Rarity tiers
 - ✅ Trait system
 
 **Current Structure**:
 ```rust
-pub struct Hatchling {
+pub struct Pangopup {
     pub nft_mint: Pubkey,
     pub authority: Pubkey,
     pub stage: LifeStage,
@@ -75,7 +75,7 @@ pub struct Hatchling {
 ### ✅ Compatible - No Conflicts
 
 **1. NFT Program Extension**
-- Current `Hatchling` struct can be extended
+- Current `Pangopup` struct can be extended
 - Add Master/Guardian fields without breaking existing functionality
 - Backward compatible with existing NFTs
 
@@ -116,9 +116,9 @@ pub struct Hatchling {
 
 ### Phase 1: Extend NFT Program (Non-Breaking)
 
-**Add to `Hatchling` struct**:
+**Add to `Pangopup` struct**:
 ```rust
-pub struct Hatchling {
+pub struct Pangopup {
     // Existing fields (unchanged)
     pub nft_mint: Pubkey,
     pub authority: Pubkey,
@@ -249,11 +249,11 @@ import { VaultProgram } from './vault';
 
 **Option 1: Designate Existing NFT as Master**
 ```
-User has Hatchling #42 (minted before Master/Guardian)
+User has Pangopup #42 (minted before Master/Guardian)
 ↓
 User calls designate_master(#42, encryption_key)
 ↓
-Hatchling #42 becomes Master NFT
+Pangopup #42 becomes Master NFT
 ↓
 Wallet system initialized
 ↓
@@ -262,7 +262,7 @@ User can now create Guardians
 
 **Option 2: Mint New Master NFT**
 ```
-User mints new Hatchling #3001
+User mints new Pangopup #3001
 ↓
 Automatically designated as Master (if first)
 ↓

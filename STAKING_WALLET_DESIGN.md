@@ -18,15 +18,28 @@ A self-custody staking subdomain where users lock PANGI tokens while maintaining
 4. Staking wallet signals staking program
 5. User earns daily rewards (distributed at end)
 6. Longer lock = higher APY
-7. Guardian reports unlock immediately
+7. Guardian reports unlock immediately to public address
+8. Early unlock = proportional rewards - 15% penalty
+   - Get rewards for time staked (e.g., 50% time = 50% rewards)
+   - 15% penalty deducted from earned rewards
+   - Penalty returns to reward pool
+   - Net payout = (time_staked_percentage × total_rewards) × 0.85
 ```
 
-**Key Principle**: **Self-Custody Staking**
-- ✅ User maintains custody of tokens
+**Key Principle**: **Self-Custody Mandatory Reporting**
+- ✅ User maintains custody of tokens (self-custody)
 - ✅ Tokens locked in user's wallet (not transferred)
 - ✅ Staking program tracks lock status
-- ✅ Rewards calculated by PANGI.sol
-- ✅ Guardian monitors and reports
+- ✅ Rewards calculated by staking program
+- ✅ Guardian reports OUT only (no inbound data from PANGI)
+- ✅ Guardian sends reports to public address where rewards are sent
+- ✅ Master installs accurate reporting configuration on staking program
+- ✅ Guardian cannot receive information from PANGI (one-way reporting)
+- ⚠️ **Early unlock penalty: Proportional rewards - 15%**
+  - User gets rewards for time actually staked
+  - 15% penalty deducted from earned rewards
+  - Penalty returns to reward pool for future stakers
+  - Example: 50% time staked = (50% × rewards) × 85% payout
 
 ---
 
@@ -37,7 +50,9 @@ A self-custody staking subdomain where users lock PANGI tokens while maintaining
 ```
 ┌─────────────────────────────────────────────────────┐
 │         Master NFT #42                              │
-│  Creates Staking Subdomain                          │
+│  • Creates Staking Subdomain                        │
+│  • Installs Guardian reporting configuration        │
+│  • Sets public address for reward reports           │
 └────────────────┬────────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────────┐
@@ -53,20 +68,23 @@ A self-custody staking subdomain where users lock PANGI tokens while maintaining
 │  • Tracks stake positions                           │
 │  • Calculates daily rewards                         │
 │  • Distributes at unlock                            │
+│  • Master-configured reporting rules                │
 └────────────────┬────────────────────────────────────┘
-                 │ governed by
-┌────────────────▼────────────────────────────────────┐
-│         PANGI.sol (Governance)                      │
-│  • Sets APY rates                                   │
-│  • Sets lock duration tiers                         │
-│  • Controls reward pool                             │
-└─────────────────────────────────────────────────────┘
-                 │
+                 │ monitored by
 ┌────────────────▼────────────────────────────────────┐
 │         Guardian NFT (Monitor)                      │
-│  • Monitors staking wallet                          │
-│  • Reports unlock events                            │
-│  • Triggers reward distribution                     │
+│  • Monitors staking wallet (read-only)              │
+│  • Reports OUT to public address                    │
+│  • NO inbound data from PANGI                       │
+│  • Reports unlock events to reward address          │
+│  • One-way reporting only                           │
+└─────────────────────────────────────────────────────┘
+                 │ reports to
+┌────────────────▼────────────────────────────────────┐
+│         Public Reward Address                       │
+│  • Receives Guardian reports                        │
+│  • Processes reward distribution                    │
+│  • Public address (no private data)                 │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -159,14 +177,16 @@ pub mod pangi_staking {
         Ok(())
     }
 
-    // Guardian reports unlock
+    // Guardian reports unlock (ONE-WAY REPORTING)
+    // Guardian sends report OUT to public reward address
+    // Guardian receives NO data from PANGI (self-custody mandatory reporting)
     pub fn report_unlock(
         ctx: Context<ReportUnlock>,
     ) -> Result<()> {
         let stake_position = &mut ctx.accounts.stake_position;
         let clock = Clock::get()?;
 
-        // Verify Guardian authority
+        // Verify Guardian authority (configured by Master)
         require!(
             ctx.accounts.guardian_nft.key() == stake_position.guardian_monitor,
             ErrorCode::UnauthorizedGuardian
@@ -225,11 +245,15 @@ pub mod pangi_staking {
             false, // removing
         )?;
 
+        // ONE-WAY REPORTING: Guardian reports OUT to public reward address
+        // Guardian does NOT receive any data from PANGI
+        // Public address configured by Master during setup
         emit!(UnlockReported {
             user: stake_position.user,
             amount: stake_position.amount,
             total_reward,
             days_staked,
+            reward_address: stake_position.reward_address, // Public address for rewards
         });
 
         Ok(())
@@ -411,7 +435,9 @@ pub struct StakePosition {
     pub total_reward: u64,
     pub rewards_claimed: bool,
     pub claim_timestamp: Option<i64>,
-    pub guardian_monitor: Pubkey,
+    pub guardian_monitor: Pubkey,   // Guardian that reports OUT
+    pub reward_address: Pubkey,     // Public address where Guardian sends reports
+                                     // Master configures this during stake creation
 }
 
 // Global staking statistics
@@ -422,7 +448,9 @@ pub struct StakingStats {
     pub total_stakers: u64,             // Total number of active stakers
     pub total_rewards_paid: u64,        // Lifetime rewards distributed
     pub total_stakes_created: u64,      // Lifetime stakes created
-    pub total_stakes_completed: u64,    // Lifetime stakes completed
+    pub total_stakes_completed: u64,    // Lifetime stakes completed (full duration)
+    pub total_early_unlocks: u64,       // Lifetime early unlocks (before duration ended)
+    pub total_rewards_forfeited: u64,   // Total rewards forfeited due to early unlock
     
     // Time-based tracking
     pub stakes_today: u64,              // Stakes created today
@@ -432,6 +460,10 @@ pub struct StakingStats {
     pub unlocks_today: u64,             // Unlocks today
     pub unlocks_this_week: u64,         // Unlocks this week
     pub unlocks_this_month: u64,        // Unlocks this month
+    
+    pub early_unlocks_today: u64,       // Early unlocks today
+    pub early_unlocks_this_week: u64,   // Early unlocks this week
+    pub early_unlocks_this_month: u64,  // Early unlocks this month
     
     // Tracking periods
     pub current_day: i64,               // Current day timestamp
@@ -469,6 +501,18 @@ const APY_90_DAYS: u16 = 1200;   // 12%
 const APY_180_DAYS: u16 = 1800;  // 18%
 const APY_365_DAYS: u16 = 2500;  // 25%
 
+// Early unlock penalty
+const EARLY_UNLOCK_PENALTY_BPS: u16 = 1500;  // 15% penalty (basis points)
+
+// Early unlock reward calculation:
+// 1. Calculate proportional rewards based on time staked
+//    proportional_rewards = (time_staked / lock_duration) × total_potential_rewards
+// 2. Apply 15% penalty
+//    penalty_amount = proportional_rewards × 0.15
+//    user_payout = proportional_rewards × 0.85
+// 3. Return penalty to reward pool
+//    reward_pool += penalty_amount
+
 // Helper functions
 fn get_apy_for_duration(days: u16) -> Result<u16> {
     match days {
@@ -494,6 +538,48 @@ fn calculate_daily_reward(amount: u64, apy_rate: u16) -> Result<u64> {
         .ok_or(ErrorCode::DivisionByZero)?;
     
     Ok(daily_reward)
+}
+
+// Calculate early unlock rewards with 15% penalty
+fn calculate_early_unlock_rewards(
+    amount: u64,
+    apy_rate: u16,
+    time_staked_seconds: i64,
+    lock_duration_seconds: i64,
+) -> Result<(u64, u64)> {
+    // Calculate total potential rewards for full duration
+    let daily_reward = calculate_daily_reward(amount, apy_rate)?;
+    let lock_duration_days = lock_duration_seconds
+        .checked_div(86400)
+        .ok_or(ErrorCode::DivisionByZero)?;
+    let total_potential_rewards = daily_reward
+        .checked_mul(lock_duration_days as u64)
+        .ok_or(ErrorCode::Overflow)?;
+    
+    // Calculate proportional rewards based on time actually staked
+    let time_staked_days = time_staked_seconds
+        .checked_div(86400)
+        .ok_or(ErrorCode::DivisionByZero)?;
+    let proportional_rewards = total_potential_rewards
+        .checked_mul(time_staked_days as u64)
+        .ok_or(ErrorCode::Overflow)?
+        .checked_div(lock_duration_days as u64)
+        .ok_or(ErrorCode::DivisionByZero)?;
+    
+    // Apply 15% penalty
+    let penalty_amount = proportional_rewards
+        .checked_mul(EARLY_UNLOCK_PENALTY_BPS as u64)
+        .ok_or(ErrorCode::Overflow)?
+        .checked_div(10000)
+        .ok_or(ErrorCode::DivisionByZero)?;
+    
+    let user_payout = proportional_rewards
+        .checked_sub(penalty_amount)
+        .ok_or(ErrorCode::Underflow)?;
+    
+    // Return (user_payout, penalty_amount)
+    // penalty_amount goes back to reward pool
+    Ok((user_payout, penalty_amount))
 }
 
 // Update time periods (reset counters when period changes)
@@ -608,6 +694,8 @@ pub struct StakingStatsView {
     pub total_rewards_paid: u64,
     pub total_stakes_created: u64,
     pub total_stakes_completed: u64,
+    pub total_early_unlocks: u64,        // Stakes unlocked before duration ended
+    pub total_rewards_forfeited: u64,    // Rewards lost due to early unlock
     pub stakes_today: u64,
     pub stakes_this_week: u64,
     pub stakes_this_month: u64,
@@ -752,13 +840,60 @@ setInterval(async () => {
 }, 60000); // Check every minute
 ```
 
-### 4. User Claims Rewards
+### 4. Early Unlock (Optional)
 
 ```typescript
-// After unlock reported, user claims rewards
+// User can unlock early but pays 15% penalty on proportional rewards
 const stakePosition = await getStakePosition(userWallet);
+const now = Date.now() / 1000;
 
-if (!stakePosition.isLocked && !stakePosition.rewardsClaimed) {
+if (now < stakePosition.unlockAt) {
+  // Calculate early unlock details
+  const timeStaked = now - stakePosition.stakedAt;
+  const lockDuration = stakePosition.unlockAt - stakePosition.stakedAt;
+  const timePercentage = timeStaked / lockDuration;
+  
+  const totalPotentialRewards = calculateTotalRewards(stakePosition);
+  const proportionalRewards = totalPotentialRewards * timePercentage;
+  const penalty = proportionalRewards * 0.15;
+  const userPayout = proportionalRewards * 0.85;
+  
+  console.log("⚠️ WARNING: Early unlock incurs 15% penalty!");
+  console.log(`Time staked: ${timePercentage * 100}% of duration`);
+  console.log(`Proportional rewards: ${proportionalRewards} PANGI`);
+  console.log(`Penalty (15%): ${penalty} PANGI (returns to pool)`);
+  console.log(`Your payout: ${userPayout} PANGI`);
+  console.log(`Days remaining: ${(stakePosition.unlockAt - now) / 86400}`);
+  
+  // User confirms early unlock
+  await stakingProgram.methods
+    .withdrawTokens(stakePosition.amount)
+    .accounts({
+      vault: vaultPDA,
+      stakeRecord: stakePositionPDA,
+      authority: userWallet.publicKey,
+      userTokenAccount: userTokenAccount,
+      vaultTokenAccount: vaultTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    })
+    .rpc();
+  
+  // Result: 
+  // - User gets principal back: 10,000 PANGI
+  // - User gets proportional rewards - 15%: userPayout PANGI
+  // - Penalty returns to pool: penalty PANGI
+  // EarlyUnlockEvent emitted with penalty amount
+}
+```
+
+### 5. User Claims Rewards (After Full Duration)
+
+```typescript
+// After unlock_at reached, user claims full rewards
+const stakePosition = await getStakePosition(userWallet);
+const now = Date.now() / 1000;
+
+if (now >= stakePosition.unlockAt && !stakePosition.rewardsClaimed) {
   await stakingProgram.methods
     .claimRewards()
     .accounts({
@@ -781,13 +916,13 @@ if (!stakePosition.isLocked && !stakePosition.rewardsClaimed) {
 
 ### Lock Duration vs APY
 
-| Lock Duration | APY | Daily Rate | Example (10,000 PANGI) |
-|---------------|-----|------------|------------------------|
-| 30 days | 5% | 0.0137% | 500 PANGI total |
-| 60 days | 8% | 0.0219% | 800 PANGI total |
-| 90 days | 12% | 0.0329% | 1,200 PANGI total |
-| 180 days | 18% | 0.0493% | 1,800 PANGI total |
-| 365 days | 25% | 0.0685% | 2,500 PANGI total |
+| Lock Duration | APY | Daily Rate | Example (10,000 PANGI) | Early Unlock (50% time) |
+|---------------|-----|------------|------------------------|-------------------------|
+| 30 days | 5% | 0.0137% | 500 PANGI total | 212.5 PANGI (85% of 250) |
+| 60 days | 8% | 0.0219% | 800 PANGI total | 340 PANGI (85% of 400) |
+| 90 days | 12% | 0.0329% | 1,200 PANGI total | 510 PANGI (85% of 600) |
+| 180 days | 18% | 0.0493% | 1,800 PANGI total | 765 PANGI (85% of 900) |
+| 365 days | 25% | 0.0685% | 2,500 PANGI total | 1,062.5 PANGI (85% of 1,250) |
 
 **Calculation**:
 ```
@@ -796,8 +931,94 @@ Total Reward = Daily Reward × Lock Duration Days
 
 Example (10,000 PANGI, 90 days, 12% APY):
 Daily Reward = (10,000 × 0.12) / 365 = 3.29 PANGI/day
-Total Reward = 3.29 × 90 = 296 PANGI
+Total Potential Reward = 3.29 × 90 = 296 PANGI
+
+Full Duration (90 days):
+Principal Returned = 10,000 PANGI ✅
+Rewards = 296 PANGI ✅ (no penalty)
+
+Early Unlock (45 days - 50% through):
+Time Percentage = 45 / 90 = 50%
+Proportional Rewards = 296 × 0.50 = 148 PANGI
+Penalty (15%) = 148 × 0.15 = 22.2 PANGI
+User Payout = 148 × 0.85 = 125.8 PANGI ✅
+To Pool = 22.2 PANGI (redistributed)
+Principal Returned = 10,000 PANGI ✅
 ```
+
+### Early Unlock Policy
+
+**⚠️ IMPORTANT: Early unlock penalty is proportional rewards - 15%**
+
+- User can withdraw principal anytime
+- If withdrawn before `unlock_at`: **proportional rewards - 15% penalty**
+- If withdrawn after `unlock_at`: **full rewards** earned (no penalty)
+- Proportional rewards based on time actually staked
+- 15% penalty returns to reward pool for future stakers
+
+**Reward Formula**:
+```
+time_percentage = time_staked / lock_duration
+proportional_rewards = time_percentage × total_potential_rewards
+penalty = proportional_rewards × 0.15
+user_payout = proportional_rewards × 0.85
+reward_pool += penalty
+```
+
+**Example Scenarios**:
+
+```
+Scenario 1: Full Duration (90 days)
+- Stake: 10,000 PANGI
+- Lock: 90 days at 12% APY
+- Wait: Full 90 days
+- Total Potential Rewards: 1,200 PANGI
+- Time Percentage: 100%
+- Proportional Rewards: 1,200 PANGI
+- Penalty: 0 PANGI (no penalty for full duration)
+- User Payout: 1,200 PANGI ✅
+- To Pool: 0 PANGI
+
+Scenario 2: Early Unlock (45 days - 50% through)
+- Stake: 10,000 PANGI
+- Lock: 90 days at 12% APY
+- Wait: 45 days (50% of duration)
+- Total Potential Rewards: 1,200 PANGI
+- Time Percentage: 50%
+- Proportional Rewards: 600 PANGI
+- Penalty: 90 PANGI (15% of 600)
+- User Payout: 510 PANGI ✅
+- To Pool: 90 PANGI (redistributed to future stakers)
+
+Scenario 3: Early Unlock (89 days - 98.9% through)
+- Stake: 10,000 PANGI
+- Lock: 90 days at 12% APY
+- Wait: 89 days (98.9% of duration)
+- Total Potential Rewards: 1,200 PANGI
+- Time Percentage: 98.9%
+- Proportional Rewards: 1,187 PANGI
+- Penalty: 178 PANGI (15% of 1,187)
+- User Payout: 1,009 PANGI ✅
+- To Pool: 178 PANGI
+
+Scenario 4: Very Early Unlock (7 days - 7.8% through)
+- Stake: 10,000 PANGI
+- Lock: 90 days at 12% APY
+- Wait: 7 days (7.8% of duration)
+- Total Potential Rewards: 1,200 PANGI
+- Time Percentage: 7.8%
+- Proportional Rewards: 93 PANGI
+- Penalty: 14 PANGI (15% of 93)
+- User Payout: 79 PANGI ✅
+- To Pool: 14 PANGI
+```
+
+**Key Benefits**:
+- ✅ Fair: Users get rewards for time actually staked
+- ✅ Penalty discourages early unlock but isn't punitive
+- ✅ Penalty returns to pool, benefiting all stakers
+- ✅ Encourages commitment while allowing flexibility
+- ✅ Pool grows from penalties, increasing sustainability
 
 ---
 

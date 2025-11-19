@@ -29,14 +29,14 @@ PANGI is a Solana-based token ecosystem built with Anchor, featuring four interc
 | Program | Description | Status |
 |---------|-------------|--------|
 | 🪙 **Token Program** | PANGI token with dynamic tax rates (1%, 0.5%, 2%, 0%) | ✅ Ready |
-| 🥚 **NFT Program** | Hatchling NFTs with 10 evolution stages | ✅ Ready |
+| 🥚 **NFT Program** | Pangopup NFTs with 10 evolution stages | ✅ Ready |
 | 🏦 **Vault Program** | NFT-linked token storage and management | ✅ Ready |
 | 🎁 **Distribution Program** | Special token distribution (50% burn, 25% vest, 25% liquid) | ✅ Ready |
 
 ### Key Features
 
 - **Dynamic Tax System**: Context-aware tax rates for different transfer types
-- **NFT Evolution**: Hatchlings evolve through 10 stages based on token holdings
+- **NFT Evolution**: Pangopups evolve through 10 stages based on token holdings
 - **Vault Integration**: Secure token storage linked to NFT ownership
 - **Conservation Fund**: Automated tax collection for ecosystem sustainability
 - **Cross-Program Composability**: Programs work together seamlessly
