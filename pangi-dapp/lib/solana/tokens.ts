@@ -176,3 +176,103 @@ export function parseTokenAmount(amount: string, decimals: number = 9): number {
   const value = parseFloat(amount);
   return Math.floor(value * Math.pow(10, decimals));
 }
+
+// ============================================================================
+// SCALES UTILITIES - PANGI Token Branding
+// ============================================================================
+
+const SCALES_PER_PANGI = 1_000_000_000; // 1 billion scales = 1 PANGI
+
+/**
+ * Convert PANGI to scales (smallest unit)
+ * 1 PANGI = 1,000,000,000 scales
+ */
+export function pangiToScales(pangi: number): number {
+  return Math.floor(pangi * SCALES_PER_PANGI);
+}
+
+/**
+ * Convert scales to PANGI
+ */
+export function scalesToPangi(scales: number): number {
+  return scales / SCALES_PER_PANGI;
+}
+
+/**
+ * Format PANGI amount with scales
+ * @param scales - Amount in scales (raw token amount)
+ * @param showScales - Whether to show scales for small amounts
+ */
+export function formatPangi(scales: number, showScales: boolean = false): string {
+  const pangi = scalesToPangi(scales);
+  
+  // For very small amounts, show in scales
+  if (showScales && scales < SCALES_PER_PANGI && scales > 0) {
+    return `${scales.toLocaleString()} scales`;
+  }
+  
+  // For amounts less than 0.001 PANGI, show in scales
+  if (pangi < 0.001 && pangi > 0) {
+    return `${scales.toLocaleString()} scales`;
+  }
+  
+  return `${pangi.toLocaleString(undefined, { maximumFractionDigits: 4 })} PANGI`;
+}
+
+/**
+ * Format PANGI with both units (detailed view)
+ */
+export function formatPangiDetailed(scales: number): string {
+  const pangi = scalesToPangi(scales);
+  
+  if (pangi >= 1) {
+    return `${pangi.toLocaleString(undefined, { maximumFractionDigits: 4 })} PANGI (${scales.toLocaleString()} scales)`;
+  } else if (scales > 0) {
+    return `${scales.toLocaleString()} scales`;
+  } else {
+    return '0 PANGI';
+  }
+}
+
+/**
+ * Format scales in compact form
+ */
+export function formatScalesCompact(scales: number): string {
+  if (scales >= 1_000_000_000_000) { // Trillion
+    return `${(scales / 1_000_000_000_000).toFixed(2)}T scales`;
+  } else if (scales >= 1_000_000_000) { // Billion
+    return `${(scales / 1_000_000_000).toFixed(2)}B scales`;
+  } else if (scales >= 1_000_000) { // Million
+    return `${(scales / 1_000_000).toFixed(2)}M scales`;
+  } else if (scales >= 1_000) { // Thousand
+    return `${(scales / 1_000).toFixed(2)}K scales`;
+  } else {
+    return `${scales.toLocaleString()} scales`;
+  }
+}
+
+/**
+ * Parse PANGI input to scales
+ */
+export function parsePangiInput(input: string): number {
+  const value = parseFloat(input);
+  if (isNaN(value)) return 0;
+  return pangiToScales(value);
+}
+
+/**
+ * Format CATH amount (uses same scale system)
+ */
+export function formatCath(scales: number, showScales: boolean = false): string {
+  const cath = scales / SCALES_PER_PANGI; // Same decimals
+  
+  if (showScales && scales < SCALES_PER_PANGI && scales > 0) {
+    return `${scales.toLocaleString()} scales`;
+  }
+  
+  if (cath < 0.001 && cath > 0) {
+    return `${scales.toLocaleString()} scales`;
+  }
+  
+  return `${cath.toLocaleString(undefined, { maximumFractionDigits: 4 })} CATH`;
+}

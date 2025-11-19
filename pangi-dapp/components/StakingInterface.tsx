@@ -13,7 +13,11 @@ import {
   getUserStakeAccounts,
   StakeAccount,
 } from "@/lib/solana/staking";
-import { getTokenBalance } from "@/lib/solana/tokens";
+import { 
+  getTokenBalance,
+  pangiToScales,
+  formatScalesCompact 
+} from "@/lib/solana/tokens";
 
 export default function StakingInterface() {
   const { connection } = useConnection();
@@ -230,11 +234,23 @@ export default function StakingInterface() {
             <p style={{ color: "#9945FF", fontSize: "20px", fontWeight: 700, margin: 0 }}>
               {pangiBalance.toLocaleString()}
             </p>
+            <p 
+              style={{ color: "#7B3FD1", fontSize: "10px", margin: "4px 0 0", fontWeight: 500 }}
+              title={`${pangiToScales(pangiBalance).toLocaleString()} scales`}
+            >
+              ⚖️ {formatScalesCompact(pangiToScales(pangiBalance))}
+            </p>
           </div>
           <div style={{ padding: "12px", background: "#1A1F26", borderRadius: "8px" }}>
             <p style={{ color: "#9AA3AE", fontSize: "12px", margin: "0 0 4px" }}>CATH Balance</p>
             <p style={{ color: "#FFA500", fontSize: "20px", fontWeight: 700, margin: 0 }}>
               {cathBalance.toLocaleString()}
+            </p>
+            <p 
+              style={{ color: "#FF8C42", fontSize: "10px", margin: "4px 0 0", fontWeight: 500 }}
+              title={`${pangiToScales(cathBalance).toLocaleString()} scales`}
+            >
+              ⚖️ {formatScalesCompact(pangiToScales(cathBalance))}
             </p>
           </div>
         </div>
@@ -347,6 +363,12 @@ export default function StakingInterface() {
           </p>
           <p style={{ color: "#14F195", fontSize: "32px", fontWeight: 700, margin: 0 }}>
             {rewards.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          </p>
+          <p 
+            style={{ color: "#00D9A3", fontSize: "11px", margin: "4px 0 0", fontWeight: 500 }}
+            title={`${pangiToScales(rewards).toLocaleString()} scales`}
+          >
+            ⚖️ {formatScalesCompact(pangiToScales(rewards))}
           </p>
           <p style={{ color: "#9AA3AE", fontSize: "12px", margin: "8px 0 0" }}>
             {apy}% APY over {lockDuration} days

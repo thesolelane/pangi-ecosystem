@@ -14,6 +14,18 @@ export const CATH_TOKEN_MINT_STR = "48rmvKgpGpUNUuH3n2UYTZS2AUxZEkaCiNjQ57q1duMA
 export const TAX_CONFIG_PDA_STR = "3qygDfXDqAMcqzmqj6K3crtuSx1VbyjNrA6csEGqRZjS";
 export const DISTRIBUTION_CONFIG_PDA_STR = "F99537D8BByU6ZhJjEe1r6Gdz1dxVtqQVbw7vn4K6to2";
 
+// Token decimals and units
+export const PANGI_DECIMALS = 9;
+export const CATH_DECIMALS = 9;
+export const SCALES_PER_PANGI = 1_000_000_000; // 1 billion scales = 1 PANGI
+export const SCALES_PER_CATH = 1_000_000_000; // 1 billion scales = 1 CATH
+
+// Display names
+export const PANGI_SYMBOL = "PANGI";
+export const CATH_SYMBOL = "CATH";
+export const PANGI_UNIT_NAME = "scales";
+export const CATH_UNIT_NAME = "scales";
+
 // Lazy-loaded PublicKey instances (use these in client components)
 let _PANGI_TOKEN_PROGRAM_ID: PublicKey | null = null;
 let _PANGI_VAULT_PROGRAM_ID: PublicKey | null = null;

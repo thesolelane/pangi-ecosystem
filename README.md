@@ -1,8 +1,12 @@
 <div align="center">
 
-# 🐼 PANGI Ecosystem
+# 🦎 PANGI Ecosystem
 
 **A comprehensive Solana token ecosystem with dynamic tax rates, NFT evolution, and advanced DeFi features**
+
+## Measured in Scales ⚖️
+
+**1 PANGI = 1 billion scales** | Just like Bitcoin has satoshis, PANGI has scales!
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Solana](https://img.shields.io/badge/Solana-1.16+-purple.svg)](https://solana.com)

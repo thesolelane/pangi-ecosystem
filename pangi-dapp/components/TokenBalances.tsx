@@ -3,7 +3,12 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 import { PANGI_TOKEN_MINT, CATH_TOKEN_MINT } from "@/lib/constants";
-import { getTokenBalance, getSolBalance } from "@/lib/solana/tokens";
+import { 
+  getTokenBalance, 
+  getSolBalance, 
+  pangiToScales,
+  formatScalesCompact 
+} from "@/lib/solana/tokens";
 import Image from "next/image";
 
 interface TokenBalanceData {
@@ -198,6 +203,17 @@ export default function TokenBalances() {
               <div style={{ fontSize: "13px", color: "#9AA3AE", fontWeight: 500 }}>
                 Governance Token
               </div>
+              <div 
+                style={{ 
+                  fontSize: "11px", 
+                  color: "#7B3FD1", 
+                  marginTop: "4px",
+                  fontWeight: 500 
+                }}
+                title={`${pangiToScales(balances.pangi).toLocaleString()} scales`}
+              >
+                ⚖️ {formatScalesCompact(pangiToScales(balances.pangi))}
+              </div>
             </>
           )}
         </div>
@@ -258,6 +274,17 @@ export default function TokenBalances() {
               </div>
               <div style={{ fontSize: "13px", color: "#9AA3AE", fontWeight: 500 }}>
                 Utility Token
+              </div>
+              <div 
+                style={{ 
+                  fontSize: "11px", 
+                  color: "#FF8C42", 
+                  marginTop: "4px",
+                  fontWeight: 500 
+                }}
+                title={`${pangiToScales(balances.cath).toLocaleString()} scales`}
+              >
+                ⚖️ {formatScalesCompact(pangiToScales(balances.cath))}
               </div>
             </>
           )}
